@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">PuzzleProof Studio placeholder icon</title>
+  <desc id="desc">Deep green puzzle studio mark with antique gold puzzle piece and artist palette.</desc>
+  <rect width="256" height="256" rx="44" fill="#1D3A37"/>
+  <circle cx="128" cy="128" r="91" fill="none" stroke="#D1A24A" stroke-width="10"/>
+  <path d="M76 82c23-21 65-28 94-6 27 20 36 55 19 83-13 22-40 35-69 31-8-1-13-9-9-16 5-9 0-18-10-20-13-3-27-1-36-12-14-17-7-43 11-60z" fill="#F5F0E6" stroke="#D1A24A" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="98" cy="115" r="10" fill="#1D3A37"/>
+  <circle cx="129" cy="99" r="10" fill="#D1A24A"/>
+  <circle cx="158" cy="119" r="10" fill="#8A6F3E"/>
+  <path d="M94 151l83 57-20 25-83-57z" fill="#D1A24A" stroke="#1A1A1A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M77 178h43v43H77z" fill="#1D3A37" stroke="#D1A24A" stroke-width="7"/>
+  <path d="M119 191c12-13 31-2 25 15-3 10-13 15-25 11z" fill="#1D3A37" stroke="#D1A24A" stroke-width="7"/>
+</svg>

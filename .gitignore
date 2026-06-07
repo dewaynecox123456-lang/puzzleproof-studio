@@ -1,0 +1,10 @@
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local runtime files
+data/logs/
+data/backups/
+.venv/

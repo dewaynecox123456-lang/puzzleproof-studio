@@ -30,6 +30,7 @@ site/puzzleproof/
 ├── index.html
 ├── intake.html
 ├── success.html
+├── _redirects
 ├── styles.css
 ├── script.js
 └── README.md
@@ -63,11 +64,14 @@ python3 -m http.server 8080
 - The early-access request form uses Netlify Forms with `data-netlify="true"`.
 - The project intake form uses Netlify Forms with `data-netlify="true"` and `enctype="multipart/form-data"` for artwork/reference uploads.
 - The project intake form posts to `/success.html`.
+- Local Python preview can display pages, but it cannot process Netlify POST form submissions.
+- Netlify Forms only processes submissions after the site is deployed on Netlify.
+- `_redirects` maps older `/thank-you` and `/success` paths to `/success.html`.
 - After deployment, submit one test request for each form and confirm both appear in the Netlify dashboard.
 
 ## Testing Forms
 
-Local preview confirms layout and field behavior, but Netlify Forms submissions and file uploads must be tested after deploying to Netlify.
+Local preview confirms layout and field behavior, but Netlify Forms submissions and file uploads must be tested after deploying to Netlify. A local Python server cannot process POST forms.
 
 Local layout test:
 
@@ -76,14 +80,17 @@ Local layout test:
 3. Navigate to `intake.html`.
 4. Confirm the Project Intake Form renders on desktop and mobile widths.
 5. Confirm required fields, dropdowns, checkbox, and file picker are visible.
+6. Open `http://localhost:8080/success.html` and confirm the success page renders.
 
 Netlify deployment test:
 
 1. Deploy the site to Netlify.
-2. Submit the early-access request form.
-3. Submit the project intake form with a small test image upload.
-4. Confirm both submissions appear in the Netlify Forms dashboard.
-5. Confirm the uploaded file is attached to the intake submission.
+2. Open `/success.html` directly and confirm it does not 404.
+3. Submit the early-access request form.
+4. Submit the project intake form with a small test image upload.
+5. Confirm both submissions redirect to `/success.html`.
+6. Confirm both submissions appear in the Netlify Forms dashboard.
+7. Confirm the uploaded file is attached to the intake submission.
 
 ## Placeholder Replacements
 

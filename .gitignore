@@ -1,20 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local virtual environments
+.venv/
+venv/
+
+# Runtime output
+data/logs/
+data/backups/
+exports/*
+jobs/*
+
+# Local/private licenses
+licenses/license.json
+
+# Packaging output
+build/
+dist/
+*.spec
 
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Local runtime files
+# Local runtime
+.venv/
 data/logs/
 data/backups/
-.venv/
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Local runtime files
-data/logs/
-data/backups/
-.venv/

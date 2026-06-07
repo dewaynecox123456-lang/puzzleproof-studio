@@ -20,13 +20,3 @@ licenses/license.json
 build/
 dist/
 *.spec
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Local runtime
-.venv/
-data/logs/
-data/backups/

@@ -63,7 +63,8 @@ python3 -m http.server 8080
 - Set the Netlify publish directory to `site/puzzleproof/`.
 - The early-access request form uses Netlify Forms with `data-netlify="true"`.
 - The project intake form uses Netlify Forms with `data-netlify="true"` and `enctype="multipart/form-data"` for artwork/reference uploads.
-- The project intake form posts to `/success.html`.
+- Form submissions redirect to the homepage after submit.
+- Netlify Forms captures submissions in the Netlify Forms dashboard.
 - Local Python preview can display pages, but it cannot process Netlify POST form submissions.
 - Netlify Forms only processes submissions after the site is deployed on Netlify.
 - `_redirects` maps older `/thank-you` and `/success` paths to `/success.html`.
@@ -88,7 +89,7 @@ Netlify deployment test:
 2. Open `/success.html` directly and confirm it does not 404.
 3. Submit the early-access request form.
 4. Submit the project intake form with a small test image upload.
-5. Confirm both submissions redirect to `/success.html`.
+5. Confirm both submissions redirect to the homepage.
 6. Confirm both submissions appear in the Netlify Forms dashboard.
 7. Confirm the uploaded file is attached to the intake submission.
 

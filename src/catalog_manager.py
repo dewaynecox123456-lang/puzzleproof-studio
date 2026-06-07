@@ -10,19 +10,20 @@ CATALOG_FILE = CATALOG_DIR / "catalog.json"
 class CatalogManager:
     def __init__(self):
         CATALOG_DIR.mkdir(parents=True, exist_ok=True)
+        self.catalog_file = CATALOG_FILE
         self.records = self.load_records()
 
     def load_records(self):
-        if not CATALOG_FILE.exists():
+        if not self.catalog_file.exists():
             return []
         try:
-            data = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
+            data = json.loads(self.catalog_file.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             return []
         return data if isinstance(data, list) else []
 
     def save_records(self):
-        CATALOG_FILE.write_text(json.dumps(self.records, indent=2), encoding="utf-8")
+        self.catalog_file.write_text(json.dumps(self.records, indent=2), encoding="utf-8")
 
     def next_catalog_id(self):
         year = datetime.now().year
@@ -62,4 +63,19 @@ class CatalogManager:
             record
             for record in self.records
             if any(query in str(record.get(field, "")).lower() for field in searchable_fields)
+        ]
+
+    def search_fields(self, artist_name="", artwork_title="", catalog_number=""):
+        filters = {
+            "artist_name": artist_name.lower().strip(),
+            "artwork_title": artwork_title.lower().strip(),
+            "catalog_number": catalog_number.lower().strip(),
+        }
+        active_filters = {field: value for field, value in filters.items() if value}
+        if not active_filters:
+            return list(self.records)
+        return [
+            record
+            for record in self.records
+            if all(value in str(record.get(field, "")).lower() for field, value in active_filters.items())
         ]

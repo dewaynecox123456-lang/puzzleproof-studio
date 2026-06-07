@@ -271,7 +271,7 @@ class PuzzleProofApp:
         buttons.pack(fill="x", pady=(14, 0))
         project_actions = (
             ("New Project", self.new_project),
-            ("Save Project", self.save_project),
+            ("Save Project", lambda: self.save_project(show_confirmation=True)),
             ("Open Project Folder", lambda: open_folder(self.current_project_folder())),
             ("Generate Artist Release", lambda: self.generate_print_document("Artist Release")),
             ("Mark Manufacturing Ready", self.mark_manufacturing_ready),
@@ -318,14 +318,31 @@ class PuzzleProofApp:
     def _build_catalog_tab(self, notebook):
         tab = ttk.Frame(notebook, padding=14)
         notebook.add(tab, text="Catalog")
-        search = ttk.Frame(tab)
+        search = ttk.LabelFrame(tab, text="Search Catalog", padding=12)
         search.pack(fill="x")
-        self.search_var = tk.StringVar()
-        ttk.Entry(search, textvariable=self.search_var).pack(side="left", fill="x", expand=True)
-        ttk.Button(search, text="Search", command=self.refresh_catalog).pack(side="left", padx=(8, 0))
-        ttk.Button(search, text="Show All", command=lambda: (self.search_var.set(""), self.refresh_catalog())).pack(side="left", padx=(8, 0))
+        self.catalog_search_vars = {
+            "artist_name": tk.StringVar(),
+            "artwork_title": tk.StringVar(),
+            "catalog_number": tk.StringVar(),
+        }
+        search_fields = (
+            ("artist_name", "Artist Name"),
+            ("artwork_title", "Artwork Title"),
+            ("catalog_number", "Catalog ID"),
+        )
+        for column, (key, label) in enumerate(search_fields):
+            ttk.Label(search, text=label).grid(row=0, column=column, sticky="w", padx=(0 if column == 0 else 12, 0))
+            ttk.Entry(search, textvariable=self.catalog_search_vars[key]).grid(row=1, column=column, sticky="ew", padx=(0 if column == 0 else 12, 0), pady=(4, 0))
+            search.columnconfigure(column, weight=1)
+        actions = ttk.Frame(search)
+        actions.grid(row=1, column=3, sticky="e", padx=(12, 0), pady=(4, 0))
+        ttk.Button(actions, text="Search", command=self.refresh_catalog).pack(side="left")
+        ttk.Button(actions, text="Show All", command=self.clear_catalog_search).pack(side="left", padx=(8, 0))
 
-        columns = ("catalog", "artist", "artwork", "approval", "ready")
+        self.catalog_result_text = tk.StringVar(value="Catalog records: 0")
+        ttk.Label(tab, textvariable=self.catalog_result_text, style="Muted.TLabel").pack(anchor="w", pady=(10, 0))
+
+        columns = ("catalog", "artist", "artwork", "approval", "ready", "updated")
         self.catalog_tree = ttk.Treeview(tab, columns=columns, show="headings", height=16)
         headings = {
             "catalog": "Catalog ID",
@@ -333,10 +350,16 @@ class PuzzleProofApp:
             "artwork": "Artwork",
             "approval": "Approval",
             "ready": "Manufacturing Ready",
+            "updated": "Updated",
         }
         for column, heading in headings.items():
             self.catalog_tree.heading(column, text=heading)
-            self.catalog_tree.column(column, width=150)
+        self.catalog_tree.column("catalog", width=150, minwidth=120)
+        self.catalog_tree.column("artist", width=180, minwidth=140)
+        self.catalog_tree.column("artwork", width=220, minwidth=160)
+        self.catalog_tree.column("approval", width=120, minwidth=90)
+        self.catalog_tree.column("ready", width=160, minwidth=120)
+        self.catalog_tree.column("updated", width=150, minwidth=120)
         self.catalog_tree.pack(fill="both", expand=True, pady=12)
         ttk.Button(tab, text="Refresh Catalog", command=self.refresh_catalog).pack(anchor="w")
         self.refresh_catalog()
@@ -344,7 +367,8 @@ class PuzzleProofApp:
     def _build_printing_tab(self, notebook):
         tab = ttk.Frame(notebook, padding=14)
         notebook.add(tab, text="Printing")
-        ttk.Label(tab, text="Create print-ready HTML files for production records and forms.").pack(anchor="w", pady=(0, 10))
+        ttk.Label(tab, text="Create print-ready HTML files for production records and forms.").pack(anchor="w")
+        ttk.Label(tab, text=f"Generated files are saved in: {EXPORTS_DIR}", style="Muted.TLabel").pack(anchor="w", pady=(4, 12))
         for document_type in ("Artist Release", "Copyright Form", "Production Sheet", "Sticker", "Insert", "Puzzle Cover"):
             ttk.Button(tab, text=f"Print {document_type}", command=lambda doc=document_type: self.generate_print_document(doc)).pack(anchor="w", pady=3)
         ttk.Button(tab, text="Print Production Package", command=self.generate_production_package).pack(anchor="w", pady=(12, 3))
@@ -400,7 +424,7 @@ class PuzzleProofApp:
         self.manufacturing_ready = False
         self.status_text.set("New draft project started.")
 
-    def save_project(self):
+    def save_project(self, show_confirmation=False):
         project = self.collect_project()
         if not project.get("catalog_number"):
             project["catalog_number"] = self.catalog.next_catalog_id()
@@ -409,6 +433,11 @@ class PuzzleProofApp:
         path = self.projects.save(saved_project)
         self.status_text.set(f"Project saved: {path}")
         self.refresh_catalog()
+        if show_confirmation:
+            messagebox.showinfo(
+                "Project Saved",
+                f"Saved project JSON:\n{path}\n\nUpdated catalog:\n{self.catalog.catalog_file}",
+            )
         return saved_project
 
     def current_project_folder(self):
@@ -462,7 +491,15 @@ class PuzzleProofApp:
             return
         self.catalog.records = self.catalog.load_records()
         self.catalog_tree.delete(*self.catalog_tree.get_children())
-        for record in self.catalog.search(self.search_var.get() if hasattr(self, "search_var") else ""):
+        if hasattr(self, "catalog_search_vars"):
+            records = self.catalog.search_fields(
+                artist_name=self.catalog_search_vars["artist_name"].get(),
+                artwork_title=self.catalog_search_vars["artwork_title"].get(),
+                catalog_number=self.catalog_search_vars["catalog_number"].get(),
+            )
+        else:
+            records = list(self.catalog.records)
+        for record in records:
             self.catalog_tree.insert(
                 "",
                 "end",
@@ -472,8 +509,16 @@ class PuzzleProofApp:
                     record.get("artwork_title", ""),
                     record.get("approval_status", ""),
                     "Yes" if record.get("manufacturing_ready") else "No",
+                    record.get("updated_at", ""),
                 ),
             )
+        if hasattr(self, "catalog_result_text"):
+            self.catalog_result_text.set(f"Matching records: {len(records)}")
+
+    def clear_catalog_search(self):
+        for var in self.catalog_search_vars.values():
+            var.set("")
+        self.refresh_catalog()
 
     def generate_print_document(self, document_type):
         project = self.save_project()

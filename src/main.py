@@ -157,27 +157,120 @@ class PuzzleProofApp:
         style.configure("InfoTitle.TLabel", background=THEME["panel_alt"], foreground=THEME["green"], font=("TkDefaultFont", 11, "bold"))
         style.configure("InfoText.TLabel", background=THEME["panel_alt"], foreground=THEME["muted"])
         style.configure("Splash.TFrame", background=THEME["green"])
-        style.configure("SplashTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 23, "bold"))
-        style.configure("SplashMeta.TLabel", background=THEME["green"], foreground=THEME["gold"])
-        style.configure("SplashText.TLabel", background=THEME["green"], foreground=THEME["white"])
+        style.configure("SplashCream.TFrame", background=THEME["ivory"])
+        style.configure("SplashFooter.TFrame", background=THEME["green"])
+        style.configure("SplashTitle.TLabel", background=THEME["ivory"], foreground=THEME["green"], font=("TkDefaultFont", 28, "bold"))
+        style.configure("SplashSubtitle.TLabel", background=THEME["ivory"], foreground=THEME["muted"], font=("TkDefaultFont", 12, "bold"))
+        style.configure("SplashMeta.TLabel", background=THEME["ivory"], foreground=THEME["green"], font=("TkDefaultFont", 10, "bold"))
+        style.configure("SplashText.TLabel", background=THEME["ivory"], foreground=THEME["text"])
+        style.configure("SplashFooter.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 9))
+        style.configure("SplashFooterMuted.TLabel", background=THEME["green"], foreground="#EADFCB", font=("TkDefaultFont", 9))
+        style.configure("Splash.Horizontal.TProgressbar", troughcolor=THEME["panel_alt"], background=THEME["gold"], bordercolor=THEME["border"], lightcolor=THEME["gold"], darkcolor=THEME["gold"])
         style.configure("AboutTitle.TLabel", background=THEME["ivory"], foreground=THEME["green"], font=("TkDefaultFont", 16, "bold"))
 
     def _show_splash_then_main(self):
         self.splash = tk.Toplevel(self.root)
         self.splash.overrideredirect(True)
         self.splash.configure(bg=THEME["green"])
-        self.splash.geometry("560x330+260+180")
-        frame = ttk.Frame(self.splash, padding=28, style="Splash.TFrame")
+        self.splash.geometry("680x460")
+        self.splash.update_idletasks()
+        self._center_splash(680, 460)
+
+        frame = ttk.Frame(self.splash, padding=8, style="Splash.TFrame")
         frame.pack(fill="both", expand=True)
-        self._draw_brand_mark(frame, size=78, background=THEME["green"]).pack(anchor="center", pady=(0, 12))
-        ttk.Label(frame, text=APP_NAME, style="SplashTitle.TLabel").pack(anchor="center", pady=(8, 4))
-        ttk.Label(frame, text=SUBTITLE, style="SplashText.TLabel", font=("TkDefaultFont", 12)).pack(anchor="center")
-        ttk.Label(frame, text=BRAND_LINE, style="SplashText.TLabel").pack(anchor="center", pady=(9, 0))
-        ttk.Label(frame, text=self.display_version, style="SplashMeta.TLabel").pack(anchor="center", pady=(13, 0))
-        ttk.Label(frame, text=f"License: {self.license_status.display}", style="SplashText.TLabel", wraplength=480).pack(anchor="center", pady=(10, 0))
-        ttk.Label(frame, text=f"Copyright: {COPYRIGHT}", style="SplashText.TLabel").pack(anchor="center", pady=(18, 0))
+        inner = ttk.Frame(frame, padding=(30, 24, 30, 0), style="SplashCream.TFrame")
+        inner.pack(fill="both", expand=True)
+
+        self._draw_splash_puzzle_icon(inner, size=112).pack(anchor="center", pady=(0, 12))
+        ttk.Label(inner, text=APP_NAME, style="SplashTitle.TLabel").pack(anchor="center")
+        ttk.Label(inner, text="Professional Puzzle Production Suite", style="SplashSubtitle.TLabel").pack(anchor="center", pady=(4, 0))
+
+        badge = tk.Label(
+            inner,
+            text=self.display_version,
+            bg=THEME["green"],
+            fg=THEME["gold"],
+            padx=14,
+            pady=5,
+            font=("TkDefaultFont", 9, "bold"),
+        )
+        badge.pack(anchor="center", pady=(14, 10))
+
+        ttk.Label(inner, text=BRAND_LINE, style="SplashMeta.TLabel").pack(anchor="center")
+
+        license_card = tk.Frame(inner, bg=THEME["panel"], highlightbackground=THEME["border"], highlightcolor=THEME["gold"], highlightthickness=1, bd=0)
+        license_card.pack(anchor="center", fill="x", padx=64, pady=(16, 14))
+        tk.Label(
+            license_card,
+            text="LICENSE STATUS",
+            bg=THEME["panel"],
+            fg=THEME["muted"],
+            font=("TkDefaultFont", 8, "bold"),
+        ).pack(anchor="center", pady=(10, 2))
+        tk.Label(
+            license_card,
+            text=self.license_status.display,
+            bg=THEME["panel"],
+            fg=THEME["green"],
+            font=("TkDefaultFont", 12, "bold"),
+        ).pack(anchor="center", pady=(0, 10))
+
+        self.splash_loading_text = tk.StringVar(value="Loading project tools...")
+        ttk.Label(inner, textvariable=self.splash_loading_text, style="SplashText.TLabel").pack(anchor="center")
+        progress = ttk.Progressbar(inner, mode="indeterminate", length=300, style="Splash.Horizontal.TProgressbar")
+        progress.pack(anchor="center", pady=(8, 14))
+        progress.start(14)
+
+        footer_canvas = tk.Canvas(inner, height=58, bg=THEME["green"], highlightthickness=0, bd=0)
+        footer_canvas.pack(fill="x", side="bottom")
+        self._draw_bayou_footer(footer_canvas)
+        footer = ttk.Frame(inner, padding=(12, 7), style="SplashFooter.TFrame")
+        footer.pack(fill="x", side="bottom")
+        ttk.Label(footer, text="BayouFinds / Wonder Piece Studio", style="SplashFooter.TLabel").pack(side="left")
+        ttk.Label(footer, text=COPYRIGHT, style="SplashFooterMuted.TLabel").pack(side="right")
+
+        self.root.after(800, lambda: self.splash_loading_text.set("Checking license and catalog..."))
+        self.root.after(1500, lambda: self.splash_loading_text.set("Preparing production workspace..."))
         self.root.withdraw()
-        self.root.after(2300, self._build_main_window)
+        self.root.after(2400, self._build_main_window)
+
+    def _center_splash(self, width, height):
+        screen_width = self.splash.winfo_screenwidth()
+        screen_height = self.splash.winfo_screenheight()
+        x = max(0, int((screen_width - width) / 2))
+        y = max(0, int((screen_height - height) / 2))
+        self.splash.geometry(f"{width}x{height}+{x}+{y}")
+
+    def _draw_splash_puzzle_icon(self, parent, size=112):
+        canvas = tk.Canvas(parent, width=size, height=size, bg=THEME["ivory"], highlightthickness=0, bd=0)
+        pad = 10
+        canvas.create_oval(pad, pad, size - pad, size - pad, fill=THEME["panel_alt"], outline=THEME["gold"], width=3)
+        piece_left = size * 0.25
+        piece_top = size * 0.30
+        piece_right = size * 0.72
+        piece_bottom = size * 0.76
+        canvas.create_rectangle(piece_left, piece_top, piece_right, piece_bottom, fill=THEME["green"], outline=THEME["gold"], width=3)
+        canvas.create_oval(size * 0.43, size * 0.18, size * 0.57, size * 0.34, fill=THEME["green"], outline=THEME["gold"], width=3)
+        canvas.create_oval(size * 0.64, size * 0.47, size * 0.80, size * 0.61, fill=THEME["ivory"], outline=THEME["gold"], width=3)
+        canvas.create_oval(size * 0.18, size * 0.48, size * 0.34, size * 0.62, fill=THEME["green"], outline=THEME["gold"], width=3)
+        canvas.create_text(size * 0.49, size * 0.55, text="P", fill=THEME["gold"], font=("TkDefaultFont", 32, "bold"))
+        return canvas
+
+    def _draw_bayou_footer(self, canvas):
+        def paint():
+            width = canvas.winfo_width()
+            height = canvas.winfo_height()
+            canvas.delete("all")
+            canvas.create_rectangle(0, 0, width, height, fill=THEME["green"], outline="")
+            canvas.create_polygon(0, height * 0.68, width * 0.20, height * 0.50, width * 0.42, height * 0.66, width * 0.64, height * 0.47, width, height * 0.64, width, height, 0, height, fill="#102724", outline="")
+            for x in (width * 0.16, width * 0.52, width * 0.78):
+                canvas.create_rectangle(x - 2, height * 0.26, x + 2, height * 0.74, fill="#102724", outline="")
+                canvas.create_polygon(x, height * 0.12, x - 26, height * 0.44, x + 24, height * 0.44, fill="#102724", outline="")
+            canvas.create_arc(-60, height * 0.38, width * 0.42, height * 1.18, start=18, extent=26, outline=THEME["gold"], width=2, style="arc")
+            canvas.create_arc(width * 0.30, height * 0.44, width + 70, height * 1.24, start=18, extent=25, outline=THEME["gold"], width=2, style="arc")
+
+        canvas.after_idle(paint)
+        canvas.bind("<Configure>", lambda _event: paint())
 
     def _draw_brand_mark(self, parent, size=58, background=None):
         bg = background or THEME["ivory"]

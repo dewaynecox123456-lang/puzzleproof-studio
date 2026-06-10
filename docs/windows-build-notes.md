@@ -23,36 +23,46 @@ During Python installation, enable `Add python.exe to PATH`.
 
 From the PuzzleProof Studio project folder:
 
-```bat
-py -3.12 -m venv .venv
-.venv\Scripts\activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m pip install pyinstaller
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1
 ```
 
-If Python 3.12 is not installed, use Python 3.11:
+That script creates `.venv-build-windows`, installs `requirements.txt` and PyInstaller, runs `python -m py_compile src\main.py`, and builds:
 
-```bat
-py -3.11 -m venv .venv
-.venv\Scripts\activate
+```text
+dist\PuzzleProofStudio\PuzzleProofStudio.exe
 ```
 
-Smoke-test before packaging:
+To also create a portable zip:
 
-```bat
-python src\main.py
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1 -Zip
 ```
 
-Build the executable:
+The PyInstaller package includes:
+
+- `assets`
+- `licenses\sample-license.json`
+- `docs`
+- `catalog`
+- `exports`
+- `VERSION`
+
+To perform the same build manually after creating and activating a Windows virtual environment:
 
 ```bat
 pyinstaller --noconfirm --clean --windowed ^
   --name PuzzleProofStudio ^
   --icon assets\icons\puzzleproof-icon.ico ^
+  --distpath dist ^
+  --workpath build\pyinstaller ^
+  --specpath build\pyinstaller ^
   --add-data "VERSION;." ^
   --add-data "assets;assets" ^
-  --add-data "licenses;licenses" ^
+  --add-data "licenses\sample-license.json;licenses" ^
+  --add-data "docs;docs" ^
+  --add-data "catalog;catalog" ^
+  --add-data "exports;exports" ^
   src\main.py
 ```
 
@@ -68,7 +78,7 @@ dist\PuzzleProofStudio\PuzzleProofStudio.exe
 
 - App launches without a console window.
 - Title bar says exactly `PuzzleProof Studio v0.1.0-EarlyAccess`.
-- Splash screen appears with PuzzleProof Studio, BayouFinds / Wonder Piece Studio, version, license status, and copyright.
+- Splash screen appears with cream background, dark green frame, large puzzle icon, PuzzleProof Studio title, Professional Puzzle Production Suite subtitle, BayouFinds / Wonder Piece Studio, version badge, license status card, bayou footer, and loading progress.
 - License status displays `Active`.
 - Project, Image Conversion, Catalog, Printing, Support, and About tabs render.
 - A new project can be saved.
@@ -87,6 +97,8 @@ If assets or license files are missing in the packaged app, confirm the `--add-d
 ```
 
 Linux and macOS use a colon for `--add-data`, but these notes are for a Windows build machine.
+
+The build intentionally includes `licenses\sample-license.json` instead of the entire `licenses` folder so a private `licenses\license.json` is not accidentally bundled.
 
 ## Icon Plan
 
@@ -110,6 +122,10 @@ Sean should receive:
 - A short note that this is an Early Access Windows 10/11 test build
 - The expected launch path after unzip: `PuzzleProofStudio\PuzzleProofStudio.exe`
 - The Sean test checklist above
+
+## MSI Installer
+
+MSI packaging requires Windows tooling such as the WiX Toolset or Visual Studio installer tooling. This Linux development environment cannot produce or validate a Windows MSI. Prepare and test the portable EXE package first, then follow `docs/msi-installer-notes.md` on a Windows machine if an MSI installer is required.
 
 ## Not Complete Until Tested
 

@@ -39,7 +39,7 @@ THEME = {
     "white": "#FFFFFF",
 }
 
-APPROVAL_STATUSES = ("Draft", "Pending", "Approved", "Revoked")
+APPROVAL_STATUSES = ("Draft", "Pending", "Non-Licensed", "Approved", "Revoked")
 PROJECT_ORIGINS = (
     "Artist Submission",
     "Company Project",
@@ -81,7 +81,8 @@ class PuzzleProofApp:
         self.printing = PrintManager()
         self.display_version = display_version(self.version)
         self.source_image = tk.StringVar()
-        self.status_text = tk.StringVar(value=self.license_status.display)
+        self.license_text = tk.StringVar(value=f"License: {self.license_status.display}")
+        self.status_text = tk.StringVar(value="Ready.")
         self.project_vars = {}
 
         self._configure_window()
@@ -90,8 +91,8 @@ class PuzzleProofApp:
 
     def _configure_window(self):
         self.root.title(f"{APP_NAME} {self.display_version}")
-        self.root.geometry("1040x720")
-        self.root.minsize(880, 620)
+        self.root.geometry("1160x760")
+        self.root.minsize(960, 660)
         self.root.configure(bg=THEME["ivory"])
         self._set_window_icon()
 
@@ -113,33 +114,48 @@ class PuzzleProofApp:
         default_font = ("TkDefaultFont", 10)
         style.configure(".", font=default_font, background=THEME["ivory"], foreground=THEME["text"])
         style.configure("TFrame", background=THEME["ivory"])
+        style.configure("App.TFrame", background=THEME["ivory"])
+        style.configure("Card.TFrame", background=THEME["panel"], relief="solid", borderwidth=1)
+        style.configure("InfoCard.TFrame", background=THEME["panel_alt"], relief="solid", borderwidth=1)
         style.configure("TLabel", background=THEME["ivory"], foreground=THEME["text"])
-        style.configure("TButton", padding=(10, 6), background=THEME["green"], foreground=THEME["white"], bordercolor=THEME["green"])
+        style.configure("TButton", padding=(12, 7), background=THEME["green"], foreground=THEME["white"], bordercolor=THEME["green"], focusthickness=2, focuscolor=THEME["gold"])
         style.map(
             "TButton",
             background=[("active", THEME["green_hover"]), ("pressed", THEME["green"])],
             foreground=[("disabled", THEME["muted"]), ("active", THEME["white"])],
         )
+        style.configure("Secondary.TButton", background=THEME["panel_alt"], foreground=THEME["green"], bordercolor=THEME["border"])
+        style.map(
+            "Secondary.TButton",
+            background=[("active", "#E4D8C5"), ("pressed", THEME["panel_alt"])],
+            foreground=[("active", THEME["green"])],
+        )
         style.configure("TEntry", fieldbackground=THEME["white"], foreground=THEME["text"])
         style.configure("TCombobox", fieldbackground=THEME["white"], foreground=THEME["text"])
         style.configure("TSpinbox", fieldbackground=THEME["white"], foreground=THEME["text"])
-        style.configure("TLabelframe", background=THEME["ivory"], foreground=THEME["text"], bordercolor=THEME["border"])
-        style.configure("TLabelframe.Label", background=THEME["ivory"], foreground=THEME["green"], font=("TkDefaultFont", 10, "bold"))
+        style.configure("TLabelframe", background=THEME["panel"], foreground=THEME["text"], bordercolor=THEME["border"])
+        style.configure("TLabelframe.Label", background=THEME["panel"], foreground=THEME["green"], font=("TkDefaultFont", 10, "bold"))
         style.configure("TNotebook", background=THEME["ivory"], borderwidth=0)
-        style.configure("TNotebook.Tab", padding=(14, 8), background=THEME["panel_alt"], foreground=THEME["text"])
+        style.configure("TNotebook.Tab", padding=(18, 10), background=THEME["panel_alt"], foreground=THEME["text"], borderwidth=0)
         style.map(
             "TNotebook.Tab",
-            background=[("selected", THEME["green"]), ("active", "#E4D8C5")],
-            foreground=[("selected", THEME["white"])],
+            background=[("selected", THEME["panel"]), ("active", "#E4D8C5")],
+            foreground=[("selected", THEME["green"]), ("active", THEME["green"])],
         )
         style.configure("Treeview", background=THEME["white"], fieldbackground=THEME["white"], foreground=THEME["text"], rowheight=26)
         style.configure("Treeview.Heading", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 10, "bold"))
         style.configure("Header.TFrame", background=THEME["green"])
-        style.configure("HeaderTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 18, "bold"))
-        style.configure("HeaderMeta.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 10))
-        style.configure("License.TLabel", background=THEME["panel_alt"], foreground=THEME["text"], padding=(10, 4), font=("TkDefaultFont", 9, "bold"))
+        style.configure("HeaderTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 25, "bold"))
+        style.configure("HeaderMeta.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 11))
+        style.configure("HeaderEyebrow.TLabel", background=THEME["green"], foreground="#EADFCB", font=("TkDefaultFont", 9, "bold"))
+        style.configure("License.TLabel", background=THEME["panel_alt"], foreground=THEME["green"], padding=(12, 6), font=("TkDefaultFont", 9, "bold"))
         style.configure("Footer.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 9))
+        style.configure("FooterMuted.TLabel", background=THEME["green"], foreground="#EADFCB", font=("TkDefaultFont", 9))
         style.configure("Muted.TLabel", background=THEME["ivory"], foreground=THEME["muted"])
+        style.configure("CardMuted.TLabel", background=THEME["panel"], foreground=THEME["muted"])
+        style.configure("CardTitle.TLabel", background=THEME["panel"], foreground=THEME["green"], font=("TkDefaultFont", 12, "bold"))
+        style.configure("InfoTitle.TLabel", background=THEME["panel_alt"], foreground=THEME["green"], font=("TkDefaultFont", 11, "bold"))
+        style.configure("InfoText.TLabel", background=THEME["panel_alt"], foreground=THEME["muted"])
         style.configure("Splash.TFrame", background=THEME["green"])
         style.configure("SplashTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 23, "bold"))
         style.configure("SplashMeta.TLabel", background=THEME["green"], foreground=THEME["gold"])
@@ -192,16 +208,19 @@ class PuzzleProofApp:
         self.splash.destroy()
         self.root.deiconify()
 
-        container = ttk.Frame(self.root, padding=12)
+        container = ttk.Frame(self.root, padding=16, style="App.TFrame")
         container.pack(fill="both", expand=True)
-        header = ttk.Frame(container, style="Header.TFrame", padding=(14, 12))
-        header.pack(fill="x", pady=(0, 10))
+        header = ttk.Frame(container, style="Header.TFrame", padding=(20, 18))
+        header.pack(fill="x", pady=(0, 12))
+
+        self._draw_brand_mark(header, size=74, background=THEME["green"]).pack(side="left", padx=(0, 18))
 
         title_group = ttk.Frame(header, style="Header.TFrame")
         title_group.pack(side="left", fill="x", expand=True)
-        ttk.Label(title_group, text=f"{APP_NAME} {self.display_version}", style="HeaderTitle.TLabel").pack(anchor="w")
-        ttk.Label(title_group, text=BRAND_LINE, style="HeaderMeta.TLabel").pack(anchor="w", pady=(2, 0))
-        ttk.Label(header, textvariable=self.status_text, style="License.TLabel").pack(side="right", padx=(12, 0))
+        ttk.Label(title_group, text=BRAND_LINE.upper(), style="HeaderEyebrow.TLabel").pack(anchor="w")
+        ttk.Label(title_group, text=APP_NAME, style="HeaderTitle.TLabel").pack(anchor="w", pady=(2, 0))
+        ttk.Label(title_group, text=f"{SUBTITLE} | {self.display_version}", style="HeaderMeta.TLabel").pack(anchor="w", pady=(4, 0))
+        ttk.Label(header, textvariable=self.license_text, style="License.TLabel").pack(side="right", padx=(16, 0))
 
         notebook = ttk.Notebook(container)
         notebook.pack(fill="both", expand=True)
@@ -214,8 +233,26 @@ class PuzzleProofApp:
 
         footer = ttk.Frame(container, style="Header.TFrame", padding=(10, 7))
         footer.pack(fill="x", pady=(10, 0))
-        ttk.Label(footer, text=BRAND_LINE, style="Footer.TLabel").pack(side="left")
+        ttk.Label(footer, textvariable=self.status_text, style="Footer.TLabel").pack(side="left")
+        ttk.Label(footer, textvariable=self.license_text, style="FooterMuted.TLabel").pack(side="left", padx=(18, 0))
         ttk.Label(footer, text=f"{WEBSITE} | {SUPPORT_EMAIL}", style="Footer.TLabel").pack(side="right")
+
+    def _card(self, parent, padding=14, style="Card.TFrame"):
+        card = ttk.Frame(parent, padding=padding, style=style)
+        return card
+
+    def _build_info_panel(self, parent, title, body):
+        panel = self._card(parent, padding=14, style="InfoCard.TFrame")
+        ttk.Label(panel, text=title, style="InfoTitle.TLabel").pack(anchor="w")
+        ttk.Label(panel, text=body, style="InfoText.TLabel", wraplength=260, justify="left").pack(anchor="w", pady=(6, 0))
+        return panel
+
+    def _build_action_card(self, parent, title, description, button_text, command, button_style="TButton"):
+        card = self._card(parent, padding=14)
+        ttk.Label(card, text=title, style="CardTitle.TLabel").pack(anchor="w")
+        ttk.Label(card, text=description, style="CardMuted.TLabel", wraplength=250, justify="left").pack(anchor="w", pady=(6, 12))
+        ttk.Button(card, text=button_text, command=command, style=button_style).pack(anchor="w", fill="x")
+        return card
 
     def _build_project_tab(self, notebook):
         tab = ttk.Frame(notebook, padding=14)
@@ -365,14 +402,105 @@ class PuzzleProofApp:
         self.refresh_catalog()
 
     def _build_printing_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=14)
+        tab = ttk.Frame(notebook, padding=16)
         notebook.add(tab, text="Printing")
-        ttk.Label(tab, text="Create print-ready HTML files for production records and forms.").pack(anchor="w")
-        ttk.Label(tab, text=f"Generated files are saved in: {EXPORTS_DIR}", style="Muted.TLabel").pack(anchor="w", pady=(4, 12))
-        for document_type in ("Artist Release", "Copyright Form", "Production Sheet", "Sticker", "Insert", "Puzzle Cover"):
-            ttk.Button(tab, text=f"Print {document_type}", command=lambda doc=document_type: self.generate_print_document(doc)).pack(anchor="w", pady=3)
-        ttk.Button(tab, text="Print Production Package", command=self.generate_production_package).pack(anchor="w", pady=(12, 3))
-        ttk.Button(tab, text="Open Exports Folder", command=lambda: open_folder(EXPORTS_DIR)).pack(anchor="w", pady=3)
+        tab.columnconfigure(0, weight=1)
+        tab.columnconfigure(1, weight=0)
+        tab.rowconfigure(1, weight=1)
+
+        intro = self._card(tab, padding=(16, 14))
+        intro.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 14))
+        ttk.Label(intro, text="Printing Command Center", style="CardTitle.TLabel").pack(anchor="w")
+        ttk.Label(
+            intro,
+            text="Create print-ready HTML files for production records, artist paperwork, packaging inserts, and release handoff.",
+            style="CardMuted.TLabel",
+            wraplength=820,
+            justify="left",
+        ).pack(anchor="w", pady=(5, 0))
+
+        actions = ttk.Frame(tab)
+        actions.grid(row=1, column=0, sticky="nsew", padx=(0, 14))
+        actions.columnconfigure(0, weight=1)
+        actions.columnconfigure(1, weight=1)
+
+        document_cards = (
+            (
+                "Artist Release",
+                "Permission record for artwork reproduction and project approval.",
+                "Print Artist Release",
+                lambda: self.generate_print_document("Artist Release"),
+            ),
+            (
+                "Copyright Form",
+                "Ownership and copyright notes for cleaner manufacturing records.",
+                "Print Copyright Form",
+                lambda: self.generate_print_document("Copyright Form"),
+            ),
+            (
+                "Production Sheet",
+                "Internal production details for puzzle sizing, approvals, and export notes.",
+                "Print Production Sheet",
+                lambda: self.generate_print_document("Production Sheet"),
+            ),
+            (
+                "Sticker",
+                "Print-ready sticker copy for package labeling and shop workflow.",
+                "Print Sticker",
+                lambda: self.generate_print_document("Sticker"),
+            ),
+            (
+                "Insert",
+                "Customer insert content for puzzle packaging and creator attribution.",
+                "Print Insert",
+                lambda: self.generate_print_document("Insert"),
+            ),
+            (
+                "Puzzle Cover",
+                "Front cover reference sheet for proofing, packaging, and production.",
+                "Print Puzzle Cover",
+                lambda: self.generate_print_document("Puzzle Cover"),
+            ),
+        )
+        for index, (title, description, button_text, command) in enumerate(document_cards):
+            row = index // 2
+            column = index % 2
+            card = self._build_action_card(actions, title, description, button_text, command)
+            card.grid(row=row, column=column, sticky="nsew", padx=(0 if column == 0 else 10, 0), pady=(0, 10))
+            actions.rowconfigure(row, weight=1)
+
+        sidebar = ttk.Frame(tab)
+        sidebar.grid(row=1, column=1, sticky="nsew")
+        sidebar.columnconfigure(0, weight=1)
+
+        self._build_info_panel(
+            sidebar,
+            "Output Location",
+            f"Generated files are saved in:\n{EXPORTS_DIR}",
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        self._build_info_panel(
+            sidebar,
+            "Before You Print",
+            "Confirm approval status, copyright owner, source artwork, and export files before packaging.",
+        ).grid(row=1, column=0, sticky="ew", pady=(0, 10))
+        self._build_info_panel(
+            sidebar,
+            "License Status",
+            self.license_status.display,
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 10))
+
+        package = self._card(sidebar, padding=14)
+        package.grid(row=3, column=0, sticky="ew")
+        ttk.Label(package, text="Production Package", style="CardTitle.TLabel").pack(anchor="w")
+        ttk.Label(
+            package,
+            text="Generate the full paperwork set or open the export folder for review.",
+            style="CardMuted.TLabel",
+            wraplength=260,
+            justify="left",
+        ).pack(anchor="w", pady=(6, 12))
+        ttk.Button(package, text="Print Production Package", command=self.generate_production_package).pack(fill="x")
+        ttk.Button(package, text="Open Exports Folder", command=lambda: open_folder(EXPORTS_DIR), style="Secondary.TButton").pack(fill="x", pady=(8, 0))
 
     def _build_support_tab(self, notebook):
         tab = ttk.Frame(notebook, padding=14)

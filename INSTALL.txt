@@ -1,0 +1,27 @@
+PuzzleProof Studio Installation
+
+Windows Portable Package:
+1. Unzip the PuzzleProofStudio package.
+2. Open the PuzzleProofStudio folder.
+3. Run PuzzleProofStudio.exe.
+4. If Windows SmartScreen appears during Early Access testing, choose More Info, then Run Anyway only if the package came from BayouFinds / Wonder Piece Studio.
+
+Source Run:
+1. Install Python 3.11 or 3.12.
+2. Install Tkinter for your operating system if it is not already included.
+3. Install requirements:
+
+   python -m pip install -r requirements.txt
+
+4. Run the app:
+
+   python src/main.py
+
+Windows Build:
+Run the Windows packaging script from PowerShell on Windows 10 or Windows 11:
+
+   powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1 -Zip
+
+The expected executable path is:
+
+   dist\PuzzleProofStudio\PuzzleProofStudio.exe

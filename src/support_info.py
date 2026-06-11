@@ -4,7 +4,7 @@ from app_paths import LOGS_DIR, ROOT_DIR, get_version
 
 
 SUPPORT_EMAIL = "support@bayoufinds.com"
-WEBSITE = "https://bayoufinds.com"
+WEBSITE = "https://puzzleproof-studio.netlify.app/"
 
 
 def build_support_info(license_status):

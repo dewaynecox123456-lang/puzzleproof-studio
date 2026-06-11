@@ -1,0 +1,27 @@
+PuzzleProof Studio License Setup
+
+PuzzleProof Studio uses an offline yearly license file.
+
+License File Location:
+licenses\license.json
+
+During Early Access, if no private license file is present, the app falls back to:
+licenses\sample-license.json
+
+Expected License Fields:
+{
+  "product": "PuzzleProof Studio",
+  "licensed_to": "Customer Name",
+  "license_key": "OFFLINE-KEY",
+  "issued_date": "2026-01-01",
+  "expires_date": "2026-12-31",
+  "status": "active",
+  "seats": 1,
+  "notes": "Seller ledger reference"
+}
+
+Important:
+- Do not share private license.json files.
+- Do not commit private license.json files to source control.
+- License validation is local and non-fatal during Early Access.
+- Contact support@bayoufinds.com for license help.

@@ -9,6 +9,7 @@ venv/
 
 # Runtime output
 data/logs/
+logs/
 data/backups/
 exports/*
 jobs/*

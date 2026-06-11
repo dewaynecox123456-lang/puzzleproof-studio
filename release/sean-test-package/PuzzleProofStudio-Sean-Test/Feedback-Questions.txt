@@ -1,0 +1,11 @@
+PuzzleProof Studio Tester Feedback
+
+1. What confused you?
+2. What took too many clicks?
+3. What information was missing?
+4. What would make you stop using it?
+5. Which print forms are useful?
+6. Which print forms are not useful?
+7. What should be added to the FAQ?
+8. Did the license setup make sense?
+9. Did the software feel ready for puzzle production?

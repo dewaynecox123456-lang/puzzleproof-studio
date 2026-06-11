@@ -47,6 +47,10 @@ The PyInstaller package includes:
 - `catalog`
 - `exports`
 - `VERSION`
+- `README.txt`
+- `INSTALL.txt`
+- `LICENSE_SETUP.txt`
+- `FAQ.txt`
 
 To perform the same build manually after creating and activating a Windows virtual environment:
 
@@ -63,6 +67,10 @@ pyinstaller --noconfirm --clean --windowed ^
   --add-data "docs;docs" ^
   --add-data "catalog;catalog" ^
   --add-data "exports;exports" ^
+  --add-data "README.txt;." ^
+  --add-data "INSTALL.txt;." ^
+  --add-data "LICENSE_SETUP.txt;." ^
+  --add-data "FAQ.txt;." ^
   src\main.py
 ```
 

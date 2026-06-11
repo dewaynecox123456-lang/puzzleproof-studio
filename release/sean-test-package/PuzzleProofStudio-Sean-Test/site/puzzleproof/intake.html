@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PuzzleProof Studio helps puzzle makers, artists, Etsy sellers, and creative businesses manage artwork, approvals, releases, and production workflows.">
+  <meta property="og:title" content="PuzzleProof Studio">
+  <meta property="og:description" content="Software for puzzle makers, artists, Etsy sellers, and small creative businesses.">
+  <meta property="og:type" content="website">
+  <!-- Replace with the final production domain when the Netlify site is live. -->
+  <meta property="og:url" content="https://REPLACE-WITH-PUZZLEPROOF-SITE/intake.html">
+  <meta property="og:image" content="/assets/icons/puzzleproof-og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PuzzleProof Studio">
+  <meta name="twitter:description" content="Software for puzzle makers, artists, Etsy sellers, and small creative businesses.">
+  <meta name="twitter:image" content="/assets/icons/puzzleproof-og.png">
+  <title>PuzzleProof Studio | BayouFinds</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/puzzleproof-icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="PuzzleProof Studio home">
+      <img class="brand-icon" src="assets/icons/puzzleproof-icon.svg" alt="" aria-hidden="true">
+      <span>
+        <strong>PuzzleProof Studio</strong>
+        <small>BayouFinds / Wonder Piece Studio</small>
+      </span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#screenshots">Screenshots</a>
+      <a href="intake.html">Project Intake</a>
+      <a href="index.html#team">Meet the Team</a>
+      <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Early Access</a>
+    </nav>
+    <a class="nav-cta" href="https://bayoufinds.com/b/x98IV" rel="noopener">Get Early Access</a>
+  </header>
+
+  <main>
+    <section class="section intake-hero">
+      <div>
+        <p class="badge">Editable Project Intake</p>
+        <p class="eyebrow">Puzzle production review</p>
+        <h1>Project Intake Form</h1>
+        <p class="subheadline">Submit artwork and project details online so PuzzleProof Studio can review the workflow without sending non-editable files back and forth.</p>
+      </div>
+      <div class="intake-note">
+        <strong>Before you submit</strong>
+        <p>Use this form for project details, approval status, manufacturing requests, notes, and optional artwork/reference images. You should only submit artwork you own or have permission to submit.</p>
+      </div>
+    </section>
+
+    <section class="section intake-section" aria-labelledby="intake-form-title">
+      <div class="form-copy">
+        <p class="eyebrow">Online intake</p>
+        <h2 id="intake-form-title">Submit project details</h2>
+        <p>Complete this editable project intake form with artist contact details, artwork information, approval status, manufacturing requests, and optional reference images. Netlify Forms will send the submission for review after deployment.</p>
+        <p class="payhip-callout">Need the app too? <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Get Early Access on Payhip</a>.</p>
+      </div>
+
+      <form class="intake-form" name="puzzleproof-project-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" action="/">
+        <input type="hidden" name="form-name" value="puzzleproof-project-intake">
+        <p class="hidden">
+          <label>Do not fill this out: <input name="bot-field"></label>
+        </p>
+
+        <fieldset>
+          <legend>Artist Details</legend>
+          <label>
+            Artist Name
+            <input type="text" name="artist_name" autocomplete="name" required>
+          </label>
+          <label>
+            Artist Email
+            <input type="email" name="artist_email" autocomplete="email" required>
+          </label>
+          <label>
+            Phone Number
+            <input type="tel" name="phone_number" autocomplete="tel">
+          </label>
+          <label>
+            Business / Studio Name
+            <input type="text" name="business_studio_name" autocomplete="organization">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Artwork Details</legend>
+          <label>
+            Artwork Title
+            <input type="text" name="artwork_title" required>
+          </label>
+          <label>
+            Copyright Owner
+            <input type="text" name="copyright_owner" required>
+          </label>
+          <label>
+            Artwork Size
+            <input type="text" name="artwork_size" placeholder="Example: 11 x 14 inches">
+          </label>
+          <label>
+            Upload Artwork / Reference Image
+            <input type="file" name="artwork_reference_image" accept="image/*">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Puzzle Details</legend>
+          <label>
+            Puzzle Size
+            <input type="text" name="puzzle_size" placeholder="Example: 8.83 x 11.77 inches">
+          </label>
+          <label>
+            Piece Count
+            <input type="text" name="piece_count" placeholder="Example: 500">
+          </label>
+          <label>
+            Catalog Number
+            <input type="text" name="catalog_number" placeholder="Leave blank if not assigned">
+          </label>
+          <label>
+            Approval Status
+            <select name="approval_status" required>
+              <option value="">Choose status</option>
+              <option>Draft</option>
+              <option>Artist Submission</option>
+              <option>Approved</option>
+              <option>Manufacturing Ready</option>
+            </select>
+          </label>
+          <label>
+            Manufacturing Request
+            <select name="manufacturing_request" required>
+              <option value="">Choose one</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Notes and Agreement</legend>
+          <label class="full-span">
+            Project Notes
+            <textarea name="project_notes" rows="6" placeholder="Share production notes, deadlines, print concerns, or questions."></textarea>
+          </label>
+          <label class="checkbox-label full-span">
+            <input type="checkbox" name="artwork_permission_confirmation" required>
+            <span>I confirm that I own or have permission to submit this artwork for puzzle production review.</span>
+          </label>
+        </fieldset>
+
+        <button type="submit">Submit Project Intake Form</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-primary">
+      <div class="footer-brand">
+        <img class="footer-icon" src="assets/icons/puzzleproof-icon.svg" alt="" aria-hidden="true">
+        <span>
+          <strong>PuzzleProof Studio</strong>
+          <span>Built by BayouFinds</span>
+          <span>Powered by Wonder Piece Studio</span>
+        </span>
+      </div>
+      <p>PuzzleProof Studio is a BayouFinds product.</p>
+    </div>
+    <div class="footer-secondary">
+      <div class="footer-links">
+        <a href="https://bayoufinds.com" rel="noopener">BayouFinds</a>
+        <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Early Access</a>
+        <a href="index.html">Home</a>
+        <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <p class="copyright">© 2026 BayouFinds.com. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

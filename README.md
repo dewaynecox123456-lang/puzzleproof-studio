@@ -35,6 +35,7 @@ python src/main.py
 - Catalog tab backed by JSON records
 - Printing tab that creates print-ready HTML files
 - Support and About tabs
+- Help menu with FAQ, support links, documentation, issue reporting, and product website links
 - Offline license check using `licenses/license.json` or `licenses/sample-license.json`
 
 ## Manufacturing Sizes
@@ -54,6 +55,7 @@ python src/main.py
 - `data/settings/` - app settings
 - `data/logs/` - support logs folder
 - `docs/` - product and handoff documentation
+- `docs/FAQ.md` - single source for built-in FAQ viewer content
 
 ## Windows Packaging
 
@@ -63,6 +65,8 @@ Do not treat the Windows executable as complete until it has been built and test
 
 ## Support
 
-Website: https://bayoufinds.com
+Website: https://puzzleproof-studio.netlify.app/
+
+BayouFinds: https://www.bayoufinds.com
 
 Support: support@bayoufinds.com

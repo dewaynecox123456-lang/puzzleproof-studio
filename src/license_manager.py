@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
-from app_paths import LICENSES_DIR
+from app_paths import BUNDLED_LICENSES_DIR, LICENSES_DIR
 
 
 @dataclass
@@ -21,9 +21,15 @@ class LicenseManager:
     def __init__(self):
         self.primary_path = LICENSES_DIR / "license.json"
         self.sample_path = LICENSES_DIR / "sample-license.json"
+        self.bundled_sample_path = BUNDLED_LICENSES_DIR / "sample-license.json"
 
     def load_license(self):
-        path = self.primary_path if self.primary_path.exists() else self.sample_path
+        if self.primary_path.exists():
+            path = self.primary_path
+        elif self.sample_path.exists():
+            path = self.sample_path
+        else:
+            path = self.bundled_sample_path
         if not path.exists():
             return LicenseStatus(
                 "Missing",

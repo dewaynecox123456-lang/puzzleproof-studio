@@ -1,16 +1,17 @@
 # PuzzleProof Studio Landing Site
 
-Dedicated Netlify-ready static landing site for PuzzleProof Studio early access.
+Netlify-ready static product landing page for PuzzleProof Studio.
 
-PuzzleProof Studio is software for puzzle makers, artists, Etsy sellers, and small creative businesses. The site presents the product, explains the limited early-access offer, links to Payhip, and collects optional access requests through Netlify Forms.
+The homepage is customer-facing and aimed at small puzzle makers, custom gift shops, artists, and production partners. The primary message is: turn one customer image into print-ready puzzle production assets faster.
 
-Current footer branding:
+## Customer Page Sections
 
-- PuzzleProof Studio
-- Built by BayouFinds
-- Powered by Wonder Piece Studio
-- PuzzleProof Studio is a BayouFinds product.
-- © 2026 BayouFinds.com. All Rights Reserved.
+- Hero: product name, production software positioning, setup-time reduction
+- What It Does: customer image import, Puzzle Print, Box Insert, Box Sticker / Label, DOCX/PNG/JPG export
+- Built From Real Workflow: Wonder Piece Studio beta testing with Sean Watkins
+- Download / Early Access: latest release link and current build
+- FAQ: Windows, DOCX, production printing, and runtime questions
+- Contact: BayouFinds / Wonder Piece Studio support
 
 ## File Structure
 
@@ -18,15 +19,8 @@ Current footer branding:
 site/puzzleproof/
 ├── assets/
 │   ├── icons/
-│   │   ├── puzzleproof-icon.svg
-│   │   └── puzzleproof-og.png
 │   ├── screenshots/
-│   │   ├── candidate-homepage.png
-│   │   ├── candidate-intake-form.png
-│   │   └── candidate-project-output.png
 │   └── team/
-│       ├── dewayne.png
-│       └── sean.png
 ├── index.html
 ├── intake.html
 ├── success.html
@@ -38,9 +32,10 @@ site/puzzleproof/
 
 ## Preview Locally
 
-From this directory:
+From the repo root:
 
 ```bash
+cd site/puzzleproof
 python3 -m http.server 8080
 ```
 
@@ -50,72 +45,18 @@ Then open:
 http://localhost:8080
 ```
 
-From the repo root:
-
-```bash
-cd site/puzzleproof
-python3 -m http.server 8080
-```
-
 ## Netlify Deploy Notes
 
 - No build command is required.
 - Set the Netlify publish directory to `site/puzzleproof/`.
-- The early-access request form uses Netlify Forms with `data-netlify="true"`.
-- The project intake form uses Netlify Forms with `data-netlify="true"` and `enctype="multipart/form-data"` for artwork/reference uploads.
-- Form submissions redirect to the homepage after submit.
-- Netlify Forms captures submissions in the Netlify Forms dashboard.
-- Local Python preview can display pages, but it cannot process Netlify POST form submissions.
-- Netlify Forms only processes submissions after the site is deployed on Netlify.
 - `_redirects` maps older `/thank-you` and `/success` paths to `/success.html`.
-- After deployment, submit one test request for each form and confirm both appear in the Netlify dashboard.
-
-## Testing Forms
-
-Local preview confirms layout and field behavior, but Netlify Forms submissions and file uploads must be tested after deploying to Netlify. A local Python server cannot process POST forms.
-
-Local layout test:
-
-1. Run `python3 -m http.server 8080`.
-2. Open `http://localhost:8080`.
-3. Navigate to `intake.html`.
-4. Confirm the Project Intake Form renders on desktop and mobile widths.
-5. Confirm required fields, dropdowns, checkbox, and file picker are visible.
-6. Open `http://localhost:8080/success.html` and confirm the success page renders.
-
-Netlify deployment test:
-
-1. Deploy the site to Netlify.
-2. Open `/success.html` directly and confirm it does not 404.
-3. Submit the early-access request form.
-4. Submit the project intake form with a small test image upload.
-5. Confirm both submissions redirect to the homepage.
-6. Confirm both submissions appear in the Netlify Forms dashboard.
-7. Confirm the uploaded file is attached to the intake submission.
-
-## Placeholder Replacements
-
-These screenshots were extracted from a temporary screencast and should be replaced after a clean re-record.
-
-Before public launch, replace:
-
-- GitHub placeholder links marked in `index.html`
-- Facebook placeholder link marked in `index.html`
-- Contact email placeholder marked in `index.html`
-- Temporary app screenshots in `assets/screenshots/`
-- OpenGraph URL placeholder marked in `index.html` and `intake.html`
-- PuzzleProof icon assets if a final production mark replaces the current early-access icon
+- Local preview confirms layout only. Netlify form handling must be tested after deployment.
 
 ## Launch Checklist
 
-1. Replace GitHub placeholder.
-2. Replace Facebook placeholder.
-3. Replace temporary screencast screenshots after a clean re-record.
-4. Confirm favicon, navbar icon, footer icon, and OpenGraph image.
-5. Test Payhip button: `https://bayoufinds.com/b/x98IV`.
-6. Test Netlify form.
-7. Test Netlify intake form submission and file upload.
-8. Confirm `/success.html` loads after deployed form submission.
-9. Confirm mobile layout.
-10. Commit changes.
-11. Deploy to Netlify.
+1. Confirm latest release link opens the current GitHub release.
+2. Confirm support email link opens a new email.
+3. Confirm homepage layout on desktop and mobile widths.
+4. Confirm `/success.html` still loads.
+5. Confirm `intake.html` still loads if linked from another campaign.
+6. Replace OpenGraph URL placeholder when the final production domain is live.

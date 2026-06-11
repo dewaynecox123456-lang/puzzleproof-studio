@@ -3,8 +3,8 @@
   --green-soft: #2d504b;
   --green-dark: #102724;
   --gold: #d1a24a;
-  --ivory: #f5f0e6;
-  --panel: #fffaf0;
+  --ivory: #f7faf8;
+  --panel: #ffffff;
   --charcoal: #1a1a1a;
   --muted: #675d4d;
   --line: #d9cbb5;
@@ -176,9 +176,9 @@ h1 {
   max-width: 760px;
   margin-bottom: 16px;
   color: var(--green);
-  font-size: clamp(3.1rem, 8vw, 6.75rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.9rem, 7vw, 5.8rem);
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 h2 {
@@ -186,7 +186,7 @@ h2 {
   color: var(--green);
   font-size: clamp(2rem, 4vw, 3.3rem);
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 h3 {
@@ -267,7 +267,9 @@ button:hover,
   background: #e0bb61;
 }
 
-.hero-panel,
+.hero-product,
+.metric-card,
+.faq-grid article,
 .intake-note,
 .team-grid article,
 form,
@@ -278,9 +280,21 @@ form,
   box-shadow: 0 18px 48px rgba(29, 58, 55, 0.12);
 }
 
-.hero-panel {
+.hero-product {
+  margin: 0;
   padding: 18px;
   border-radius: 14px;
+}
+
+.hero-product img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top left;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
 }
 
 .window-card {
@@ -392,9 +406,57 @@ form,
 }
 
 .feature-grid article,
-.team-grid article {
+.team-grid article,
+.faq-grid article {
   border-radius: 10px;
   padding: 22px;
+}
+
+.output-grid article {
+  min-height: 170px;
+}
+
+.workflow-band,
+.download-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+  gap: 32px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.workflow-band p,
+.download-panel p {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.metric-card {
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.metric-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.metric-card strong {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--green);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  line-height: 1.05;
+}
+
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .screenshots figure {
@@ -849,6 +911,8 @@ textarea {
 @media (max-width: 820px) {
   .hero,
   .early-access,
+  .workflow-band,
+  .download-panel,
   .intake-promo,
   .team,
   .access,
@@ -863,7 +927,8 @@ textarea {
   .feature-grid,
   .team-grid,
   .screenshot-grid,
-  .step-grid {
+  .step-grid,
+  .faq-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -900,7 +965,8 @@ textarea {
   .feature-grid,
   .team-grid,
   .screenshot-grid,
-  .step-grid {
+  .step-grid,
+  .faq-grid {
     grid-template-columns: 1fr;
   }
 

@@ -62,17 +62,17 @@ The software exists to:
 
 # Manufacturing Specifications
 
-## Puzzle Image
+## Puzzle Print
 
 Width: 8.83 inches
 Height: 11.77 inches
 
-## Sticker Image
+## Box Sticker / Label
 
 Width: 4.37 inches
 Height: 5.10 inches
 
-## Insert Image
+## Box Insert
 
 Width: 3.75 inches
 Height: 5.00 inches
@@ -124,20 +124,22 @@ Supported Formats:
 - PNG
 - JPG
 - JPEG
+- DOCX
 
 Functions:
 
 - Import Artwork
-- Crop
-- Resize
+- Apply preset crop
+- Apply preset resize
 - Export
-- Save Presets
 
 Export Targets:
 
-- Puzzle
-- Sticker
-- Insert
+- Puzzle Print
+- Box Insert
+- Box Sticker / Label
+
+DOCX export exists as transition compatibility for users who currently rely on Microsoft Word as a manual workaround. Word is not a core technical requirement. PNG and JPG exports remain available for direct print-ready image workflows. The workflow must stay focused on preset-based output generation from one customer image and these three production outputs; batch processing and social media package generation are not part of this release scope.
 
 # Copyright System
 

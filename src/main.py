@@ -27,7 +27,7 @@ from app_paths import (
     get_version,
 )
 from catalog_manager import CatalogManager
-from image_processor import EXPORT_TARGETS, ImageProcessor
+from image_processor import EXPORT_TARGETS, OUTPUT_FORMATS, ImageProcessor
 from license_manager import LicenseManager
 from print_manager import PrintManager
 from project_manager import ProjectManager
@@ -67,6 +67,11 @@ PROJECT_ORIGINS = (
     "Wonder Piece Studio Original",
 )
 PLACEMENTS = ("Bottom Right", "Bottom Left", "Bottom Center")
+PRINTER_GUIDANCE = {
+    "Puzzle Print": "Sublimation printer / sublimation paper",
+    "Box Insert": "Standard printer / regular paper",
+    "Box Sticker / Label": "Sticker paper or label printer",
+}
 DEFAULT_FAQ = {
     "Getting Started": [
         (
@@ -739,16 +744,21 @@ class PuzzleProofApp:
 
         options = ttk.LabelFrame(tab, text="Export Options", padding=10)
         options.pack(fill="x", pady=10)
-        self.export_type = tk.StringVar(value="Puzzle")
-        self.export_format = tk.StringVar(value="PNG")
+        self.export_type = tk.StringVar(value="Puzzle Print")
+        self.export_format = tk.StringVar(value="DOCX")
+        self.last_output_preset = tk.StringVar(value="Selected output preset: Puzzle Print")
+        self.last_output_format = tk.StringVar(value="Output format: DOCX")
+        self.last_output_path = tk.StringVar(value="Saved file path: Not exported yet")
+        self.last_output_printer = tk.StringVar(value=f"Suggested printer: {PRINTER_GUIDANCE['Puzzle Print']}")
+        self.last_output_file = None
         self.copyright_text = tk.StringVar(value=DEFAULT_COPYRIGHT_TEXT)
         self.placement = tk.StringVar(value="Bottom Right")
         self.font_size = tk.IntVar(value=42)
         self.opacity = tk.IntVar(value=180)
 
         rows = (
-            ("Export Type", ttk.Combobox(options, textvariable=self.export_type, values=tuple(EXPORT_TARGETS.keys()), state="readonly")),
-            ("Format", ttk.Combobox(options, textvariable=self.export_format, values=("PNG", "JPEG"), state="readonly")),
+            ("Output Preset", ttk.Combobox(options, textvariable=self.export_type, values=tuple(EXPORT_TARGETS.keys()), state="readonly")),
+            ("Output Format", ttk.Combobox(options, textvariable=self.export_format, values=OUTPUT_FORMATS, state="readonly")),
             ("Copyright Text", ttk.Entry(options, textvariable=self.copyright_text)),
             ("Placement", ttk.Combobox(options, textvariable=self.placement, values=PLACEMENTS, state="readonly")),
             ("Font Size", ttk.Spinbox(options, from_=14, to=96, textvariable=self.font_size)),
@@ -759,7 +769,17 @@ class PuzzleProofApp:
             widget.grid(row=row, column=1, sticky="ew", pady=4, padx=(10, 0))
         options.columnconfigure(1, weight=1)
 
-        ttk.Button(tab, text="Apply Crop/Resize and Export", command=self.export_image).pack(anchor="w")
+        self.export_type.trace_add("write", self.update_export_summary)
+        self.export_format.trace_add("write", self.update_export_summary)
+
+        ttk.Button(tab, text="Apply Preset Crop/Resize and Export", command=self.export_image).pack(anchor="w")
+        summary = ttk.LabelFrame(tab, text="Latest Output", padding=10)
+        summary.pack(fill="x", pady=(10, 0))
+        ttk.Label(summary, textvariable=self.last_output_preset).pack(anchor="w")
+        ttk.Label(summary, textvariable=self.last_output_format).pack(anchor="w", pady=(3, 0))
+        ttk.Label(summary, textvariable=self.last_output_printer).pack(anchor="w", pady=(3, 0))
+        ttk.Label(summary, textvariable=self.last_output_path, wraplength=820, justify="left").pack(anchor="w", pady=(3, 8))
+        ttk.Button(summary, text="Open Output Folder", command=self.open_latest_output_folder).pack(anchor="w")
         self.sample_label = ttk.Label(tab, text=self.sample_artwork_status(), padding=(0, 12, 0, 0))
         self.sample_label.pack(anchor="w")
 
@@ -964,6 +984,10 @@ class PuzzleProofApp:
         self.notes_text.delete("1.0", "end")
         self.source_image.set("")
         self.export_files = []
+        if hasattr(self, "last_output_path"):
+            self.last_output_path.set("Saved file path: Not exported yet")
+            self.last_output_file = None
+            self.update_export_summary()
         self.manufacturing_ready = False
         self.status_text.set("New draft project started.")
 
@@ -998,6 +1022,20 @@ class PuzzleProofApp:
             self.source_image.set(path)
             self.status_text.set(f"Imported artwork: {path}")
 
+    def update_export_summary(self, *_args):
+        if not hasattr(self, "last_output_preset"):
+            return
+        preset = self.export_type.get()
+        self.last_output_preset.set(f"Selected output preset: {preset}")
+        self.last_output_format.set(f"Output format: {self.export_format.get()}")
+        self.last_output_printer.set(f"Suggested printer: {PRINTER_GUIDANCE.get(preset, 'Review output preset')}")
+
+    def open_latest_output_folder(self):
+        if self.last_output_file:
+            open_folder(Path(self.last_output_file).parent)
+            return
+        open_folder(EXPORTS_DIR)
+
     def export_image(self):
         if not self.source_image.get():
             messagebox.showwarning("Image Conversion", "Import a source image before exporting.")
@@ -1016,8 +1054,22 @@ class PuzzleProofApp:
             messagebox.showerror("Image Conversion", str(exc))
             return
         self.export_files = list(dict.fromkeys(getattr(self, "export_files", []) + [str(output_path)]))
-        self.status_text.set(f"Export created: {output_path}")
+        preset = self.export_type.get()
+        output_format = self.export_format.get()
+        suggested_printer = PRINTER_GUIDANCE.get(preset, "Review output preset")
+        self.last_output_file = output_path
+        self.last_output_path.set(f"Saved file path: {output_path}")
+        self.update_export_summary()
         self.save_project()
+        self.status_text.set(f"Export created: {output_path}")
+        messagebox.showinfo(
+            "Export Created",
+            "Export created:\n"
+            f"{preset}\n"
+            f"Format: {output_format}\n"
+            f"Saved to: {output_path}\n"
+            f"Suggested printer: {suggested_printer}",
+        )
 
     def mark_manufacturing_ready(self):
         project = self.collect_project()

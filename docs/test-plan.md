@@ -66,6 +66,29 @@ Steps:
 7. Generate a production package.
 8. Verify multiple HTML files are created in `exports/`.
 
+## 5. Preset Output Workflow Test
+
+Expected result: preset production outputs are generated from one customer image without manual resizing or cropping.
+
+Steps:
+
+1. Open the Image Conversion tab.
+2. Import one PNG or JPG customer image.
+3. Confirm the default output format is `DOCX`.
+4. Select `Puzzle Print`, choose `DOCX`, and export.
+5. Verify the export success details show `Puzzle Print`, `DOCX`, the full saved path, and `Sublimation printer / sublimation paper`.
+6. Select `Box Insert`, choose `DOCX`, and export.
+7. Verify the export success details show `Box Insert`, `DOCX`, the full saved path, and `Standard printer / regular paper`.
+8. Select `Box Sticker / Label`, choose `DOCX`, and export.
+9. Verify the export success details show `Box Sticker / Label`, `DOCX`, the full saved path, and `Sticker paper or label printer`.
+10. Verify all three DOCX files are created in `exports/`.
+11. Verify the DOCX files open in Microsoft Word on Windows.
+12. Choose `PNG` or `JPG` for one preset and confirm image output is created for direct image workflows.
+13. Click Open Output Folder and confirm it opens the generated file's folder or the `exports/` folder.
+14. Confirm the output folder is clear and contains the generated preset files.
+
+Note: The Word check validates DOCX transition compatibility only. The core workflow requirement is preset-based output generation that removes repeated resizing, cropping, and positioning.
+
 ## Regression Checks
 
 - App launches.
@@ -74,4 +97,4 @@ Steps:
 - Project, Image Conversion, Catalog, Printing, Support, and About tabs render.
 - License still shows `Active`.
 - No private `licenses/license.json` is committed.
-- No inventory, supply tracking, accounting, shipping, CRM, cloud database, or web rewrite features are present.
+- No batch processing, social media package generation, inventory, supply tracking, accounting, shipping, CRM, cloud database, or web rewrite features are present.

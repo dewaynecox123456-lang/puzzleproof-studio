@@ -31,7 +31,7 @@ python src/main.py
 
 - Splash screen with version, copyright, and license status
 - Project tab for artist/project metadata and approval tracking
-- Image Conversion tab for PNG/JPG imports and Puzzle, Sticker, or Insert exports
+- Image Conversion tab for one customer image import and preset Puzzle Print, Box Insert, or Box Sticker / Label exports
 - Catalog tab backed by JSON records
 - Printing tab that creates print-ready HTML files
 - Support and About tabs
@@ -40,9 +40,25 @@ python src/main.py
 
 ## Manufacturing Sizes
 
-- Puzzle Image: 8.83 x 11.77 inches at 300 DPI
-- Sticker Image: 4.37 x 5.10 inches at 300 DPI
-- Insert Image: 3.75 x 5.00 inches at 300 DPI
+- Puzzle Print: 8.83 x 11.77 inches at 300 DPI
+- Box Sticker / Label: 4.37 x 5.10 inches at 300 DPI
+- Box Insert: 3.75 x 5.00 inches at 300 DPI
+
+## Preset Output Workflow
+
+PuzzleProof Studio exports preset production outputs from one customer image so users do not have to repeatedly resize, crop, and position artwork for every order. Word is Sean's current manual workaround, not a technical requirement for the product.
+
+- DOCX output is retained as transition comfort for users moving away from Word-based manual setup.
+- PNG and JPG output remain available for direct print-ready image workflows.
+- The current workflow is limited to one customer image and the three production outputs above. Batch processing and social media package generation are intentionally out of scope.
+
+The Image Conversion tab defaults to DOCX for Sean's current comfort level, while keeping PNG and JPG available for direct image workflows. After each export, the app shows the selected preset, output format, full saved path, suggested printer type, and an Open Output Folder button.
+
+Suggested printer guidance:
+
+- Puzzle Print: Sublimation printer / sublimation paper
+- Box Insert: Standard printer / regular paper
+- Box Sticker / Label: Sticker paper or label printer
 
 ## Folder Structure
 

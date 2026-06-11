@@ -40,7 +40,17 @@ Project JSON files are saved in the `jobs` folder. Catalog metadata is saved in 
 
 ### How do I import artwork?
 
-Open the Image Conversion tab, choose the source artwork file, select the export target, then run the export action.
+Open the Image Conversion tab, choose the source artwork file, select the production output preset, choose PNG, JPG, or DOCX, then run the export action.
+
+DOCX is the default because it is available as transition comfort for users who are comfortable printing from Microsoft Word. PNG and JPG are available for direct image workflows. The main goal is eliminating repeated resizing, cropping, and positioning for Puzzle Print, Box Insert, and Box Sticker / Label outputs.
+
+After export, PuzzleProof shows the selected preset, output format, full saved path, suggested printer type, and an Open Output Folder button.
+
+Suggested printer guidance:
+
+- Puzzle Print: Sublimation printer / sublimation paper
+- Box Insert: Standard printer / regular paper
+- Box Sticker / Label: Sticker paper or label printer
 
 ### My artwork import or export failed. What should I check?
 

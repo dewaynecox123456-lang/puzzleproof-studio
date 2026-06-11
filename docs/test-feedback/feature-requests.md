@@ -16,6 +16,7 @@ Use this file to collect tester-requested improvements without changing the v0.1
 
 ## Seeded Candidates
 
+- One Image -> Many Assets workflow planning
 - Windows installer / MSI
 - License import wizard
 - Better error messages

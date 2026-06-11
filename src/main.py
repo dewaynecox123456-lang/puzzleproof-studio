@@ -1,6 +1,9 @@
+import logging
 import os
 import subprocess
 import sys
+import webbrowser
+from datetime import datetime
 from pathlib import Path
 
 try:
@@ -12,7 +15,17 @@ except ModuleNotFoundError:
     messagebox = None
     ttk = None
 
-from app_paths import EXPORTS_DIR, JOBS_DIR, LINUX_ICON_FILE, LOGS_DIR, ROOT_DIR, SAMPLE_IMAGES_DIR, ensure_app_dirs, get_version
+from app_paths import (
+    EXPORTS_DIR,
+    JOBS_DIR,
+    LINUX_ICON_FILE,
+    LOGS_DIR,
+    RESOURCE_ROOT,
+    ROOT_DIR,
+    SAMPLE_IMAGES_DIR,
+    ensure_app_dirs,
+    get_version,
+)
 from catalog_manager import CatalogManager
 from image_processor import EXPORT_TARGETS, ImageProcessor
 from license_manager import LicenseManager
@@ -26,6 +39,13 @@ SUBTITLE = "Artist-to-Puzzle Production Utility"
 COPYRIGHT = "© 2026 Wonder Piece Studio. All Rights Reserved."
 DEFAULT_COPYRIGHT_TEXT = COPYRIGHT
 BRAND_LINE = "BayouFinds / Wonder Piece Studio"
+PRODUCT_WEBSITE = "https://puzzleproof-studio.netlify.app/"
+BAYOUFINDS_WEBSITE = "https://www.bayoufinds.com"
+GITHUB_REPOSITORY = "https://github.com/dewaynecox123456-lang/puzzleproof-studio"
+BUG_REPORTS_URL = "https://github.com/dewaynecox123456-lang/puzzleproof-studio/issues"
+DOCUMENTATION_URL = GITHUB_REPOSITORY
+FAQ_SOURCE_FILE = RESOURCE_ROOT / "docs" / "FAQ.md"
+LOGGER = logging.getLogger(__name__)
 THEME = {
     "green": "#1D3A37",
     "green_hover": "#294B47",
@@ -47,6 +67,88 @@ PROJECT_ORIGINS = (
     "Wonder Piece Studio Original",
 )
 PLACEMENTS = ("Bottom Right", "Bottom Left", "Bottom Center")
+DEFAULT_FAQ = {
+    "Getting Started": [
+        (
+            "What is PuzzleProof Studio?",
+            "PuzzleProof Studio is a desktop production tool for managing artist approvals, puzzle project records, image exports, catalog data, and print-ready production documents.",
+        ),
+        (
+            "What should I do first?",
+            "Start in the Project tab, enter the artist and artwork details, confirm the approval status, then save the project before exporting images or printing documents.",
+        ),
+    ],
+    "Licensing": [
+        (
+            "How does licensing work?",
+            "PuzzleProof Studio uses an offline yearly license file. During Early Access, the app can fall back to the included sample license so testing is not blocked.",
+        ),
+        (
+            "Where do I put license.json?",
+            "Place a private license file at licenses/license.json. Do not share or commit private license files.",
+        ),
+    ],
+    "Projects": [
+        (
+            "Where are project records saved?",
+            "Saved project JSON files are stored under the jobs folder, with catalog metadata also written to catalog/catalog.json.",
+        ),
+        (
+            "What is Manufacturing Ready?",
+            "Manufacturing Ready means the project has the required approval, artwork, copyright owner, and export information needed before production.",
+        ),
+    ],
+    "Catalog": [
+        (
+            "How do I find a saved project?",
+            "Use the Catalog tab to search by artist name, artwork title, or catalog ID. Use Show All to reset filters.",
+        ),
+        (
+            "Can multiple users edit the catalog at once?",
+            "Not in this Early Access build. Catalog storage is local JSON, so treat it as a single-user workflow.",
+        ),
+    ],
+    "Printing": [
+        (
+            "What does the Printing tab create?",
+            "It creates print-ready HTML files for artist releases, copyright forms, production sheets, stickers, inserts, puzzle covers, and production packages.",
+        ),
+        (
+            "Does it print directly to my printer?",
+            "The current workflow creates print-ready files and opens folders for review. Native printer selection can be added later.",
+        ),
+    ],
+    "Production Packages": [
+        (
+            "What is a production package?",
+            "A production package generates the full set of print-ready production documents for the current project.",
+        ),
+        (
+            "Where are production package files saved?",
+            "Generated files are saved in the exports folder.",
+        ),
+    ],
+    "Troubleshooting": [
+        (
+            "The app will not open. What should I check?",
+            "Confirm Python and Tkinter are installed for source runs, or use the Windows packaged executable after it has been built and tested on Windows.",
+        ),
+        (
+            "My export failed. What should I check?",
+            "Confirm a source image is selected and that the image file still exists at the path shown in the Image Conversion tab.",
+        ),
+    ],
+    "Support": [
+        (
+            "How do I contact support?",
+            "Use Help > Contact Support, copy the Support tab information, and include the project steps that led to the problem.",
+        ),
+        (
+            "Where do I report a bug?",
+            "Use Help > Report Issue to open the GitHub issue tracker.",
+        ),
+    ],
+}
 
 
 def display_version(version):
@@ -70,6 +172,23 @@ def open_folder(path):
         messagebox.showwarning("Open Folder", f"Could not open folder:\n{path}\n\n{exc}")
 
 
+def configure_logging():
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    log_file = LOGS_DIR / f"puzzleproof-studio-{datetime.now():%Y%m%d-%H%M%S}.log"
+    logging.basicConfig(
+        filename=log_file,
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+    logging.captureWarnings(True)
+    LOGGER.info("Starting %s", APP_NAME)
+    LOGGER.info("Version: %s", get_version())
+    LOGGER.info("App folder: %s", ROOT_DIR)
+    LOGGER.info("Resource folder: %s", RESOURCE_ROOT)
+    LOGGER.info("Logs folder: %s", LOGS_DIR)
+    return log_file
+
+
 class PuzzleProofApp:
     def __init__(self, root):
         self.root = root
@@ -91,8 +210,8 @@ class PuzzleProofApp:
 
     def _configure_window(self):
         self.root.title(f"{APP_NAME} {self.display_version}")
-        self.root.geometry("1160x760")
-        self.root.minsize(960, 660)
+        self.root.geometry("1120x720")
+        self.root.minsize(900, 560)
         self.root.configure(bg=THEME["ivory"])
         self._set_window_icon()
 
@@ -118,7 +237,7 @@ class PuzzleProofApp:
         style.configure("Card.TFrame", background=THEME["panel"], relief="solid", borderwidth=1)
         style.configure("InfoCard.TFrame", background=THEME["panel_alt"], relief="solid", borderwidth=1)
         style.configure("TLabel", background=THEME["ivory"], foreground=THEME["text"])
-        style.configure("TButton", padding=(12, 7), background=THEME["green"], foreground=THEME["white"], bordercolor=THEME["green"], focusthickness=2, focuscolor=THEME["gold"])
+        style.configure("TButton", padding=(10, 5), background=THEME["green"], foreground=THEME["white"], bordercolor=THEME["green"], focusthickness=2, focuscolor=THEME["gold"])
         style.map(
             "TButton",
             background=[("active", THEME["green_hover"]), ("pressed", THEME["green"])],
@@ -136,7 +255,7 @@ class PuzzleProofApp:
         style.configure("TLabelframe", background=THEME["panel"], foreground=THEME["text"], bordercolor=THEME["border"])
         style.configure("TLabelframe.Label", background=THEME["panel"], foreground=THEME["green"], font=("TkDefaultFont", 10, "bold"))
         style.configure("TNotebook", background=THEME["ivory"], borderwidth=0)
-        style.configure("TNotebook.Tab", padding=(18, 10), background=THEME["panel_alt"], foreground=THEME["text"], borderwidth=0)
+        style.configure("TNotebook.Tab", padding=(14, 7), background=THEME["panel_alt"], foreground=THEME["text"], borderwidth=0)
         style.map(
             "TNotebook.Tab",
             background=[("selected", THEME["panel"]), ("active", "#E4D8C5")],
@@ -145,8 +264,8 @@ class PuzzleProofApp:
         style.configure("Treeview", background=THEME["white"], fieldbackground=THEME["white"], foreground=THEME["text"], rowheight=26)
         style.configure("Treeview.Heading", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 10, "bold"))
         style.configure("Header.TFrame", background=THEME["green"])
-        style.configure("HeaderTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 25, "bold"))
-        style.configure("HeaderMeta.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 11))
+        style.configure("HeaderTitle.TLabel", background=THEME["green"], foreground=THEME["gold"], font=("TkDefaultFont", 21, "bold"))
+        style.configure("HeaderMeta.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 10))
         style.configure("HeaderEyebrow.TLabel", background=THEME["green"], foreground="#EADFCB", font=("TkDefaultFont", 9, "bold"))
         style.configure("License.TLabel", background=THEME["panel_alt"], foreground=THEME["green"], padding=(12, 6), font=("TkDefaultFont", 9, "bold"))
         style.configure("Footer.TLabel", background=THEME["green"], foreground=THEME["white"], font=("TkDefaultFont", 9))
@@ -300,13 +419,14 @@ class PuzzleProofApp:
     def _build_main_window(self):
         self.splash.destroy()
         self.root.deiconify()
+        self._build_menu()
 
-        container = ttk.Frame(self.root, padding=16, style="App.TFrame")
+        container = ttk.Frame(self.root, padding=10, style="App.TFrame")
         container.pack(fill="both", expand=True)
-        header = ttk.Frame(container, style="Header.TFrame", padding=(20, 18))
-        header.pack(fill="x", pady=(0, 12))
+        header = ttk.Frame(container, style="Header.TFrame", padding=(14, 10))
+        header.pack(fill="x", pady=(0, 8))
 
-        self._draw_brand_mark(header, size=74, background=THEME["green"]).pack(side="left", padx=(0, 18))
+        self._draw_brand_mark(header, size=54, background=THEME["green"]).pack(side="left", padx=(0, 12))
 
         title_group = ttk.Frame(header, style="Header.TFrame")
         title_group.pack(side="left", fill="x", expand=True)
@@ -315,20 +435,53 @@ class PuzzleProofApp:
         ttk.Label(title_group, text=f"{SUBTITLE} | {self.display_version}", style="HeaderMeta.TLabel").pack(anchor="w", pady=(4, 0))
         ttk.Label(header, textvariable=self.license_text, style="License.TLabel").pack(side="right", padx=(16, 0))
 
-        notebook = ttk.Notebook(container)
-        notebook.pack(fill="both", expand=True)
-        self._build_project_tab(notebook)
-        self._build_image_tab(notebook)
-        self._build_catalog_tab(notebook)
-        self._build_printing_tab(notebook)
-        self._build_support_tab(notebook)
-        self._build_about_tab(notebook)
+        self.notebook = ttk.Notebook(container)
+        self.notebook.pack(fill="both", expand=True)
+        self._build_project_tab(self.notebook)
+        self._build_image_tab(self.notebook)
+        self._build_catalog_tab(self.notebook)
+        self._build_printing_tab(self.notebook)
+        self._build_support_tab(self.notebook)
+        self._build_about_tab(self.notebook)
 
-        footer = ttk.Frame(container, style="Header.TFrame", padding=(10, 7))
-        footer.pack(fill="x", pady=(10, 0))
+        footer = ttk.Frame(container, style="Header.TFrame", padding=(8, 5))
+        footer.pack(fill="x", pady=(8, 0))
         ttk.Label(footer, textvariable=self.status_text, style="Footer.TLabel").pack(side="left")
         ttk.Label(footer, textvariable=self.license_text, style="FooterMuted.TLabel").pack(side="left", padx=(18, 0))
         ttk.Label(footer, text=f"{WEBSITE} | {SUPPORT_EMAIL}", style="Footer.TLabel").pack(side="right")
+
+    def _build_menu(self):
+        menu_bar = tk.Menu(self.root)
+        help_menu = tk.Menu(menu_bar, tearoff=False)
+        help_menu.add_command(label="FAQ", command=self.show_faq_window)
+        help_menu.add_separator()
+        help_menu.add_command(label="Contact Support", command=self.contact_support)
+        help_menu.add_command(label="Report Issue", command=lambda: self.open_link(BUG_REPORTS_URL))
+        help_menu.add_command(label="Open Logs Folder", command=lambda: open_folder(LOGS_DIR))
+        help_menu.add_separator()
+        help_menu.add_command(label="Product Website", command=lambda: self.open_link(PRODUCT_WEBSITE))
+        help_menu.add_command(label="Documentation", command=lambda: self.open_link(DOCUMENTATION_URL))
+        help_menu.add_separator()
+        help_menu.add_command(label="About PuzzleProof Studio", command=self.show_about_tab)
+        menu_bar.add_cascade(label="Help", menu=help_menu)
+        self.root.config(menu=menu_bar)
+
+    def open_link(self, url):
+        try:
+            webbrowser.open(url, new=2)
+            self.status_text.set(f"Opened: {url}")
+        except Exception as exc:  # noqa: BLE001 - GUI should report and continue
+            messagebox.showwarning("Open Link", f"Could not open link:\n{url}\n\n{exc}")
+
+    def contact_support(self):
+        subject = "PuzzleProof Studio Support"
+        body = f"Version: {self.display_version}%0D%0ALicense: {self.license_status.display}%0D%0A"
+        self.open_link(f"mailto:{SUPPORT_EMAIL}?subject={subject.replace(' ', '%20')}&body={body}")
+
+    def show_about_tab(self):
+        if hasattr(self, "notebook"):
+            self.notebook.select(5)
+            self.status_text.set("About PuzzleProof Studio opened.")
 
     def _card(self, parent, padding=14, style="Card.TFrame"):
         card = ttk.Frame(parent, padding=padding, style=style)
@@ -347,10 +500,173 @@ class PuzzleProofApp:
         ttk.Button(card, text=button_text, command=command, style=button_style).pack(anchor="w", fill="x")
         return card
 
+    def _add_scrollable_tab(self, notebook, title, padding=10):
+        tab = ttk.Frame(notebook)
+        notebook.add(tab, text=title)
+        tab.rowconfigure(0, weight=1)
+        tab.columnconfigure(0, weight=1)
+
+        canvas = tk.Canvas(tab, bg=THEME["ivory"], highlightthickness=0, bd=0)
+        scrollbar = ttk.Scrollbar(tab, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        content = ttk.Frame(canvas, padding=padding, style="App.TFrame")
+        content_id = canvas.create_window((0, 0), window=content, anchor="nw")
+
+        def refresh_scroll_region(_event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        def resize_content(event):
+            canvas.itemconfigure(content_id, width=event.width)
+
+        def on_mousewheel(event):
+            if event.num == 4:
+                canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                canvas.yview_scroll(1, "units")
+            else:
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        def bind_wheel(_event):
+            canvas.bind_all("<MouseWheel>", on_mousewheel)
+            canvas.bind_all("<Button-4>", on_mousewheel)
+            canvas.bind_all("<Button-5>", on_mousewheel)
+
+        def unbind_wheel(_event):
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        content.bind("<Configure>", refresh_scroll_region)
+        canvas.bind("<Configure>", resize_content)
+        canvas.bind("<Enter>", bind_wheel)
+        canvas.bind("<Leave>", unbind_wheel)
+        return content
+
+    def load_faq_content(self):
+        if not FAQ_SOURCE_FILE.exists():
+            return DEFAULT_FAQ
+
+        categories = {}
+        current_category = None
+        current_question = None
+        answer_lines = []
+
+        def flush_question():
+            if current_category and current_question:
+                answer = "\n".join(answer_lines).strip()
+                categories.setdefault(current_category, []).append((current_question, answer or "No answer has been added yet."))
+
+        for raw_line in FAQ_SOURCE_FILE.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if line.startswith("## "):
+                flush_question()
+                current_category = line[3:].strip()
+                current_question = None
+                answer_lines = []
+                categories.setdefault(current_category, [])
+            elif line.startswith("### "):
+                flush_question()
+                current_question = line[4:].strip()
+                answer_lines = []
+            elif current_question:
+                answer_lines.append(raw_line)
+        flush_question()
+
+        return categories or DEFAULT_FAQ
+
+    def show_faq_window(self):
+        faq = self.load_faq_content()
+        window = tk.Toplevel(self.root)
+        window.title("PuzzleProof Studio FAQ")
+        window.geometry("820x560")
+        window.minsize(720, 480)
+        window.configure(bg=THEME["ivory"])
+        window.transient(self.root)
+
+        header = ttk.Frame(window, padding=(16, 14), style="Header.TFrame")
+        header.pack(fill="x")
+        ttk.Label(header, text="Help Center", style="HeaderTitle.TLabel").pack(anchor="w")
+        ttk.Label(header, text="PuzzleProof Studio FAQ and customer support links", style="HeaderMeta.TLabel").pack(anchor="w", pady=(3, 0))
+
+        body = ttk.Frame(window, padding=14)
+        body.pack(fill="both", expand=True)
+        body.columnconfigure(1, weight=1)
+        body.rowconfigure(0, weight=1)
+
+        category_frame = self._card(body, padding=10)
+        category_frame.grid(row=0, column=0, sticky="ns", padx=(0, 12))
+        ttk.Label(category_frame, text="Categories", style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
+        category_list = tk.Listbox(
+            category_frame,
+            height=16,
+            width=24,
+            bg=THEME["white"],
+            fg=THEME["text"],
+            selectbackground=THEME["green"],
+            selectforeground=THEME["white"],
+            highlightthickness=1,
+            highlightbackground=THEME["border"],
+            bd=0,
+            activestyle="none",
+        )
+        category_list.pack(fill="both", expand=True)
+
+        answer_frame = self._card(body, padding=12)
+        answer_frame.grid(row=0, column=1, sticky="nsew")
+        answer_frame.rowconfigure(0, weight=1)
+        answer_frame.columnconfigure(0, weight=1)
+        text = tk.Text(
+            answer_frame,
+            wrap="word",
+            bg=THEME["panel"],
+            fg=THEME["text"],
+            relief="flat",
+            borderwidth=0,
+            padx=8,
+            pady=8,
+            font=("TkDefaultFont", 10),
+        )
+        text.grid(row=0, column=0, sticky="nsew")
+        scrollbar = ttk.Scrollbar(answer_frame, orient="vertical", command=text.yview)
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        text.configure(yscrollcommand=scrollbar.set)
+        text.tag_configure("question", foreground=THEME["green"], font=("TkDefaultFont", 11, "bold"), spacing1=8)
+        text.tag_configure("answer", foreground=THEME["text"], spacing3=10)
+
+        def render_category(category):
+            text.configure(state="normal")
+            text.delete("1.0", "end")
+            for question, answer in faq.get(category, []):
+                text.insert("end", f"{question}\n", "question")
+                text.insert("end", f"{answer.strip()}\n\n", "answer")
+            text.configure(state="disabled")
+
+        def on_select(_event=None):
+            selection = category_list.curselection()
+            if selection:
+                render_category(category_list.get(selection[0]))
+
+        for category in faq:
+            category_list.insert("end", category)
+        category_list.bind("<<ListboxSelect>>", on_select)
+        if faq:
+            category_list.selection_set(0)
+            render_category(next(iter(faq)))
+
+        links = ttk.Frame(window, padding=(14, 0, 14, 14))
+        links.pack(fill="x")
+        ttk.Button(links, text="Product Website", command=lambda: self.open_link(PRODUCT_WEBSITE), style="Secondary.TButton").pack(side="left")
+        ttk.Button(links, text="BayouFinds", command=lambda: self.open_link(BAYOUFINDS_WEBSITE), style="Secondary.TButton").pack(side="left", padx=(8, 0))
+        ttk.Button(links, text="GitHub Repository", command=lambda: self.open_link(GITHUB_REPOSITORY), style="Secondary.TButton").pack(side="left", padx=(8, 0))
+        ttk.Button(links, text="Bug Reports", command=lambda: self.open_link(BUG_REPORTS_URL)).pack(side="right")
+        self.status_text.set("FAQ opened.")
+
     def _build_project_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=14)
-        notebook.add(tab, text="Project")
-        form = ttk.LabelFrame(tab, text="Project Details", padding=14)
+        tab = self._add_scrollable_tab(notebook, "Project", padding=10)
+        form = ttk.LabelFrame(tab, text="Project Details", padding=10)
         form.pack(fill="both", expand=True)
 
         fields = (
@@ -378,7 +694,7 @@ class PuzzleProofApp:
         ttk.Label(form, text="Project Notes").grid(row=6, column=0, sticky="nw", pady=(12, 4))
         self.notes_text = tk.Text(
             form,
-            height=8,
+            height=6,
             wrap="word",
             bg=THEME["white"],
             fg=THEME["text"],
@@ -395,10 +711,10 @@ class PuzzleProofApp:
         form.columnconfigure(3, weight=1)
         form.rowconfigure(6, weight=1)
 
-        ttk.Label(tab, text="Required before manufacturing: approved status, source artwork, copyright owner, and at least one export.", style="Muted.TLabel").pack(anchor="w", pady=(10, 0))
+        ttk.Label(tab, text="Required before manufacturing: approved status, source artwork, copyright owner, and at least one export.", style="Muted.TLabel").pack(anchor="w", pady=(8, 0))
 
         buttons = ttk.Frame(tab)
-        buttons.pack(fill="x", pady=(14, 0))
+        buttons.pack(fill="x", pady=(10, 0))
         project_actions = (
             ("New Project", self.new_project),
             ("Save Project", lambda: self.save_project(show_confirmation=True)),
@@ -407,20 +723,22 @@ class PuzzleProofApp:
             ("Mark Manufacturing Ready", self.mark_manufacturing_ready),
         )
         for index, (label, command) in enumerate(project_actions):
-            ttk.Button(buttons, text=label, command=command).grid(row=0, column=index, sticky="ew", padx=(0 if index == 0 else 8, 0), pady=2)
-            buttons.columnconfigure(index, weight=1)
+            row = index // 3
+            column = index % 3
+            ttk.Button(buttons, text=label, command=command).grid(row=row, column=column, sticky="ew", padx=(0 if column == 0 else 6, 0), pady=2)
+        for column in range(3):
+            buttons.columnconfigure(column, weight=1)
 
     def _build_image_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=14)
-        notebook.add(tab, text="Image Conversion")
+        tab = self._add_scrollable_tab(notebook, "Image Conversion", padding=10)
 
-        source = ttk.LabelFrame(tab, text="Source Artwork", padding=12)
+        source = ttk.LabelFrame(tab, text="Source Artwork", padding=10)
         source.pack(fill="x")
         ttk.Entry(source, textvariable=self.source_image).pack(side="left", fill="x", expand=True)
         ttk.Button(source, text="Import Artwork", command=self.import_artwork).pack(side="left", padx=(8, 0))
 
-        options = ttk.LabelFrame(tab, text="Export Options", padding=12)
-        options.pack(fill="x", pady=14)
+        options = ttk.LabelFrame(tab, text="Export Options", padding=10)
+        options.pack(fill="x", pady=10)
         self.export_type = tk.StringVar(value="Puzzle")
         self.export_format = tk.StringVar(value="PNG")
         self.copyright_text = tk.StringVar(value=DEFAULT_COPYRIGHT_TEXT)
@@ -442,13 +760,13 @@ class PuzzleProofApp:
         options.columnconfigure(1, weight=1)
 
         ttk.Button(tab, text="Apply Crop/Resize and Export", command=self.export_image).pack(anchor="w")
-        self.sample_label = ttk.Label(tab, text=self.sample_artwork_status(), padding=(0, 18, 0, 0))
+        self.sample_label = ttk.Label(tab, text=self.sample_artwork_status(), padding=(0, 12, 0, 0))
         self.sample_label.pack(anchor="w")
 
     def _build_catalog_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=14)
+        tab = ttk.Frame(notebook, padding=10)
         notebook.add(tab, text="Catalog")
-        search = ttk.LabelFrame(tab, text="Search Catalog", padding=12)
+        search = ttk.LabelFrame(tab, text="Search Catalog", padding=10)
         search.pack(fill="x")
         self.catalog_search_vars = {
             "artist_name": tk.StringVar(),
@@ -473,7 +791,11 @@ class PuzzleProofApp:
         ttk.Label(tab, textvariable=self.catalog_result_text, style="Muted.TLabel").pack(anchor="w", pady=(10, 0))
 
         columns = ("catalog", "artist", "artwork", "approval", "ready", "updated")
-        self.catalog_tree = ttk.Treeview(tab, columns=columns, show="headings", height=16)
+        tree_frame = ttk.Frame(tab)
+        tree_frame.pack(fill="both", expand=True, pady=10)
+        tree_frame.rowconfigure(0, weight=1)
+        tree_frame.columnconfigure(0, weight=1)
+        self.catalog_tree = ttk.Treeview(tree_frame, columns=columns, show="headings", height=9)
         headings = {
             "catalog": "Catalog ID",
             "artist": "Artist",
@@ -490,19 +812,21 @@ class PuzzleProofApp:
         self.catalog_tree.column("approval", width=120, minwidth=90)
         self.catalog_tree.column("ready", width=160, minwidth=120)
         self.catalog_tree.column("updated", width=150, minwidth=120)
-        self.catalog_tree.pack(fill="both", expand=True, pady=12)
+        tree_scroll = ttk.Scrollbar(tree_frame, orient="vertical", command=self.catalog_tree.yview)
+        self.catalog_tree.configure(yscrollcommand=tree_scroll.set)
+        self.catalog_tree.grid(row=0, column=0, sticky="nsew")
+        tree_scroll.grid(row=0, column=1, sticky="ns")
         ttk.Button(tab, text="Refresh Catalog", command=self.refresh_catalog).pack(anchor="w")
         self.refresh_catalog()
 
     def _build_printing_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=16)
-        notebook.add(tab, text="Printing")
+        tab = self._add_scrollable_tab(notebook, "Printing", padding=10)
         tab.columnconfigure(0, weight=1)
         tab.columnconfigure(1, weight=0)
         tab.rowconfigure(1, weight=1)
 
-        intro = self._card(tab, padding=(16, 14))
-        intro.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 14))
+        intro = self._card(tab, padding=(12, 10))
+        intro.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         ttk.Label(intro, text="Printing Command Center", style="CardTitle.TLabel").pack(anchor="w")
         ttk.Label(
             intro,
@@ -513,7 +837,7 @@ class PuzzleProofApp:
         ).pack(anchor="w", pady=(5, 0))
 
         actions = ttk.Frame(tab)
-        actions.grid(row=1, column=0, sticky="nsew", padx=(0, 14))
+        actions.grid(row=1, column=0, sticky="nsew", padx=(0, 10))
         actions.columnconfigure(0, weight=1)
         actions.columnconfigure(1, weight=1)
 
@@ -559,7 +883,7 @@ class PuzzleProofApp:
             row = index // 2
             column = index % 2
             card = self._build_action_card(actions, title, description, button_text, command)
-            card.grid(row=row, column=column, sticky="nsew", padx=(0 if column == 0 else 10, 0), pady=(0, 10))
+            card.grid(row=row, column=column, sticky="nsew", padx=(0 if column == 0 else 8, 0), pady=(0, 8))
             actions.rowconfigure(row, weight=1)
 
         sidebar = ttk.Frame(tab)
@@ -570,19 +894,19 @@ class PuzzleProofApp:
             sidebar,
             "Output Location",
             f"Generated files are saved in:\n{EXPORTS_DIR}",
-        ).grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 8))
         self._build_info_panel(
             sidebar,
             "Before You Print",
             "Confirm approval status, copyright owner, source artwork, and export files before packaging.",
-        ).grid(row=1, column=0, sticky="ew", pady=(0, 10))
+        ).grid(row=1, column=0, sticky="ew", pady=(0, 8))
         self._build_info_panel(
             sidebar,
             "License Status",
             self.license_status.display,
-        ).grid(row=2, column=0, sticky="ew", pady=(0, 10))
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 8))
 
-        package = self._card(sidebar, padding=14)
+        package = self._card(sidebar, padding=10)
         package.grid(row=3, column=0, sticky="ew")
         ttk.Label(package, text="Production Package", style="CardTitle.TLabel").pack(anchor="w")
         ttk.Label(
@@ -596,8 +920,7 @@ class PuzzleProofApp:
         ttk.Button(package, text="Open Exports Folder", command=lambda: open_folder(EXPORTS_DIR), style="Secondary.TButton").pack(fill="x", pady=(8, 0))
 
     def _build_support_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=14)
-        notebook.add(tab, text="Support")
+        tab = self._add_scrollable_tab(notebook, "Support", padding=10)
         self.support_info = build_support_info(self.license_status)
         ttk.Label(tab, text=format_support_info(self.support_info), justify="left").pack(anchor="w")
         buttons = ttk.Frame(tab)
@@ -607,8 +930,7 @@ class PuzzleProofApp:
         ttk.Button(buttons, text="Copy Support Info", command=self.copy_support_info).pack(side="left")
 
     def _build_about_tab(self, notebook):
-        tab = ttk.Frame(notebook, padding=18)
-        notebook.add(tab, text="About")
+        tab = self._add_scrollable_tab(notebook, "About", padding=12)
         header = ttk.Frame(tab)
         header.pack(anchor="nw", fill="x", pady=(0, 14))
         self._draw_brand_mark(header, size=64).pack(side="left", padx=(0, 14))
@@ -767,17 +1089,38 @@ class PuzzleProofApp:
 
 
 def main():
+    ensure_app_dirs()
+    log_file = configure_logging()
     if tk is None:
+        LOGGER.error("Tkinter is not available.")
         print(
             "PuzzleProof Studio requires Tkinter. On Fedora, install it with: sudo dnf install python3-tkinter",
             file=sys.stderr,
         )
         sys.exit(1)
-    ensure_app_dirs()
     root = tk.Tk()
+
+    def report_callback_exception(exc_type, exc_value, exc_traceback):
+        LOGGER.exception("Unhandled Tkinter exception", exc_info=(exc_type, exc_value, exc_traceback))
+        messagebox.showerror(
+            "PuzzleProof Studio Error",
+            f"An unexpected error occurred. Details were saved to:\n{log_file}",
+        )
+
+    root.report_callback_exception = report_callback_exception
     PuzzleProofApp(root)
-    root.mainloop()
+    try:
+        root.mainloop()
+    except Exception:
+        LOGGER.exception("Unhandled application exception")
+        raise
+    finally:
+        LOGGER.info("PuzzleProof Studio closed.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        logging.getLogger(__name__).exception("Fatal startup error")
+        raise

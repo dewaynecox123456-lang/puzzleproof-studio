@@ -21,3 +21,6 @@ licenses/license.json
 build/
 dist/
 *.spec
+
+# Release artifacts
+release/*.zip

@@ -281,6 +281,7 @@ button:hover,
 
 .hero-product,
 .metric-card,
+.roadmap-card,
 .faq-grid article,
 .intake-note,
 .team-grid article,
@@ -445,13 +446,18 @@ form,
 }
 
 .workflow-band,
+.roadmap-section,
+.download-panel {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.workflow-band,
 .download-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
   gap: 32px;
   align-items: center;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
 }
 
 .workflow-band p,
@@ -479,6 +485,45 @@ form,
   color: var(--green);
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   line-height: 1.05;
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.roadmap-card {
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.roadmap-card .microcopy {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--gold);
+}
+
+.roadmap-card p {
+  color: var(--muted);
+}
+
+.change-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--green-dark);
+}
+
+.compact-list {
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.compact-list li {
+  padding: 9px 12px;
 }
 
 .faq-grid {
@@ -1029,6 +1074,7 @@ textarea {
   .team-grid,
   .screenshot-grid,
   .step-grid,
+  .roadmap-grid,
   .faq-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1067,6 +1113,7 @@ textarea {
   .team-grid,
   .screenshot-grid,
   .step-grid,
+  .roadmap-grid,
   .faq-grid {
     grid-template-columns: 1fr;
   }

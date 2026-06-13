@@ -45,6 +45,7 @@ GITHUB_REPOSITORY = "https://github.com/dewaynecox123456-lang/puzzleproof-studio
 BUG_REPORTS_URL = "https://github.com/dewaynecox123456-lang/puzzleproof-studio/issues"
 DOCUMENTATION_URL = GITHUB_REPOSITORY
 FAQ_SOURCE_FILE = RESOURCE_ROOT / "docs" / "FAQ.md"
+PRINTING_GUIDE_FILE = RESOURCE_ROOT / "docs" / "printing-guide.md"
 LOGGER = logging.getLogger(__name__)
 THEME = {
     "green": "#1D3A37",
@@ -72,6 +73,12 @@ PRINTER_GUIDANCE = {
     "Box Insert": "Standard printer / regular paper",
     "Box Sticker / Label": "Sticker paper or label printer",
 }
+REQUIRED_PRINT_FIELDS = (
+    ("artist_name", "Artist Name"),
+    ("artwork_title", "Artwork Title"),
+    ("copyright_owner", "Copyright Owner"),
+    ("catalog_number", "Catalog Number"),
+)
 DEFAULT_FAQ = {
     "Getting Started": [
         (
@@ -173,11 +180,13 @@ def open_folder(path):
             subprocess.Popen(["open", str(path)])
         else:
             subprocess.Popen(["xdg-open", str(path)])
-    except OSError as exc:
-        messagebox.showwarning("Open Folder", f"Could not open folder:\n{path}\n\n{exc}")
+        return True
+    except OSError:
+        messagebox.showwarning("Open Folder", f"Could not open this folder automatically:\n{path}\n\nPlease open it manually.")
+        return False
 
 
-def open_file(path):
+def open_file(path, fallback_message=None):
     path = Path(path)
     try:
         if sys.platform.startswith("win"):
@@ -186,8 +195,13 @@ def open_file(path):
             subprocess.Popen(["open", str(path)])
         else:
             subprocess.Popen(["xdg-open", str(path)])
-    except OSError as exc:
-        messagebox.showwarning("Open File", f"Could not open file:\n{path}\n\n{exc}")
+        return True
+    except OSError:
+        messagebox.showwarning(
+            "Open File",
+            fallback_message or f"Could not open this file automatically:\n{path}\n\nPlease open it manually.",
+        )
+        return False
 
 
 def configure_logging():
@@ -221,6 +235,7 @@ class PuzzleProofApp:
         self.license_text = tk.StringVar(value=f"License: {self.license_status.display}")
         self.status_text = tk.StringVar(value="Ready.")
         self.project_vars = {}
+        self.project_field_widgets = {}
 
         self._configure_window()
         self._configure_theme()
@@ -268,6 +283,7 @@ class PuzzleProofApp:
             foreground=[("active", THEME["green"])],
         )
         style.configure("TEntry", fieldbackground=THEME["white"], foreground=THEME["text"])
+        style.configure("Missing.TEntry", fieldbackground="#FFF0F0", foreground=THEME["text"], bordercolor="#B00020")
         style.configure("TCombobox", fieldbackground=THEME["white"], foreground=THEME["text"])
         style.configure("TSpinbox", fieldbackground=THEME["white"], foreground=THEME["text"])
         style.configure("TLabelframe", background=THEME["panel"], foreground=THEME["text"], bordercolor=THEME["border"])
@@ -508,7 +524,10 @@ class PuzzleProofApp:
     def _build_info_panel(self, parent, title, body):
         panel = self._card(parent, padding=14, style="InfoCard.TFrame")
         ttk.Label(panel, text=title, style="InfoTitle.TLabel").pack(anchor="w")
-        ttk.Label(panel, text=body, style="InfoText.TLabel", wraplength=260, justify="left").pack(anchor="w", pady=(6, 0))
+        if hasattr(body, "get"):
+            ttk.Label(panel, textvariable=body, style="InfoText.TLabel", wraplength=260, justify="left").pack(anchor="w", pady=(6, 0))
+        else:
+            ttk.Label(panel, text=body, style="InfoText.TLabel", wraplength=260, justify="left").pack(anchor="w", pady=(6, 0))
         return panel
 
     def _build_action_card(self, parent, title, description, button_text, command, button_style="TButton"):
@@ -699,7 +718,9 @@ class PuzzleProofApp:
             ttk.Label(form, text=label).grid(row=row, column=0, sticky="w", pady=4)
             var = tk.StringVar()
             self.project_vars[key] = var
-            ttk.Entry(form, textvariable=var).grid(row=row, column=1, sticky="ew", pady=4, padx=(12, 24))
+            entry = ttk.Entry(form, textvariable=var)
+            entry.grid(row=row, column=1, sticky="ew", pady=4, padx=(12, 24))
+            self.project_field_widgets[key] = entry
 
         ttk.Label(form, text="Approval Status").grid(row=0, column=2, sticky="w", pady=4)
         self.project_vars["approval_status"] = tk.StringVar(value="Draft")
@@ -864,7 +885,10 @@ class PuzzleProofApp:
         ttk.Label(intro, text="Printing Command Center", style="CardTitle.TLabel").pack(anchor="w")
         ttk.Label(
             intro,
-            text="Create print-ready HTML files for production records, artist paperwork, packaging inserts, and release handoff.",
+            text=(
+                "PuzzleProof Studio creates print-ready files. Review the output file, then print from Word, "
+                "LibreOffice, or your preferred PDF/DOCX viewer."
+            ),
             style="CardMuted.TLabel",
             wraplength=820,
             justify="left",
@@ -879,37 +903,37 @@ class PuzzleProofApp:
             (
                 "Artist Release",
                 "Permission record for artwork reproduction and project approval.",
-                "Print Artist Release",
+                "Create Artist Release",
                 lambda: self.generate_print_document("Artist Release"),
             ),
             (
                 "Copyright Form",
                 "Ownership and copyright notes for cleaner manufacturing records.",
-                "Print Copyright Form",
+                "Create Copyright Form",
                 lambda: self.generate_print_document("Copyright Form"),
             ),
             (
                 "Production Sheet",
                 "Internal production details for puzzle sizing, approvals, and export notes.",
-                "Print Production Sheet",
+                "Create Production Sheet",
                 lambda: self.generate_print_document("Production Sheet"),
             ),
             (
                 "Sticker",
                 "Print-ready sticker copy for package labeling and shop workflow.",
-                "Print Sticker",
+                "Create Sticker",
                 lambda: self.generate_print_document("Sticker"),
             ),
             (
                 "Insert",
                 "Customer insert content for puzzle packaging and creator attribution.",
-                "Print Insert",
+                "Create Insert",
                 lambda: self.generate_print_document("Insert"),
             ),
             (
                 "Puzzle Cover",
                 "Front cover reference sheet for proofing, packaging, and production.",
-                "Print Puzzle Cover",
+                "Create Puzzle Cover",
                 lambda: self.generate_print_document("Puzzle Cover"),
             ),
         )
@@ -927,21 +951,27 @@ class PuzzleProofApp:
         self._build_info_panel(
             sidebar,
             "Output Location",
-            f"Generated files are saved in:\n{EXPORTS_DIR}",
+            f"All generated printing files are saved here:\n{EXPORTS_DIR}",
         ).grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        self.printing_output_text = tk.StringVar(value="No printing file created yet.")
+        self._build_info_panel(
+            sidebar,
+            "Last Created File",
+            self.printing_output_text,
+        ).grid(row=1, column=0, sticky="ew", pady=(0, 8))
         self._build_info_panel(
             sidebar,
             "Before You Print",
             "Confirm approval status, copyright owner, source artwork, and export files before packaging.",
-        ).grid(row=1, column=0, sticky="ew", pady=(0, 8))
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 8))
         self._build_info_panel(
             sidebar,
             "License Status",
             self.license_status.display,
-        ).grid(row=2, column=0, sticky="ew", pady=(0, 8))
+        ).grid(row=3, column=0, sticky="ew", pady=(0, 8))
 
         package = self._card(sidebar, padding=10)
-        package.grid(row=3, column=0, sticky="ew")
+        package.grid(row=4, column=0, sticky="ew")
         ttk.Label(package, text="Production Package", style="CardTitle.TLabel").pack(anchor="w")
         ttk.Label(
             package,
@@ -950,8 +980,9 @@ class PuzzleProofApp:
             wraplength=260,
             justify="left",
         ).pack(anchor="w", pady=(6, 12))
-        ttk.Button(package, text="Print Production Package", command=self.generate_production_package).pack(fill="x")
+        ttk.Button(package, text="Create Production Package", command=self.generate_production_package).pack(fill="x")
         ttk.Button(package, text="Open Exports Folder", command=lambda: open_folder(EXPORTS_DIR), style="Secondary.TButton").pack(fill="x", pady=(8, 0))
+        ttk.Button(package, text="Printing Guide", command=self.open_printing_guide, style="Secondary.TButton").pack(fill="x", pady=(8, 0))
 
     def _build_support_tab(self, notebook):
         tab = self._add_scrollable_tab(notebook, "Support", padding=10)
@@ -1141,18 +1172,96 @@ class PuzzleProofApp:
             var.set("")
         self.refresh_catalog()
 
+    def open_printing_guide(self):
+        if not PRINTING_GUIDE_FILE.exists():
+            messagebox.showwarning(
+                "Printing Guide",
+                f"The printing guide could not be found:\n{PRINTING_GUIDE_FILE}",
+            )
+            return
+        if open_file(PRINTING_GUIDE_FILE):
+            self.status_text.set(f"Printing guide opened: {PRINTING_GUIDE_FILE}")
+
+    def validate_printing_fields(self):
+        project = self.collect_project()
+        missing = []
+        for key, label in REQUIRED_PRINT_FIELDS:
+            widget = self.project_field_widgets.get(key)
+            if widget:
+                widget.configure(style="TEntry")
+            if not project.get(key):
+                missing.append((key, label))
+                if widget:
+                    widget.configure(style="Missing.TEntry")
+
+        if not missing:
+            return True
+
+        labels = [label for _key, label in missing]
+        if len(labels) == 1:
+            field_text = labels[0]
+        else:
+            field_text = f"{', '.join(labels[:-1])}, and {labels[-1]}"
+        messagebox.showwarning(
+            "Complete Project Details",
+            f"Please complete {field_text} before generating paperwork.",
+        )
+        self.status_text.set("Complete the highlighted project fields before generating paperwork.")
+        first_widget = self.project_field_widgets.get(missing[0][0])
+        if first_widget:
+            first_widget.focus_set()
+        return False
+
     def generate_print_document(self, document_type):
-        project = self.save_project()
-        path = self.printing.create_document(document_type, project)
+        if not self.validate_printing_fields():
+            return
+
+        try:
+            project = self.save_project()
+            path = self.printing.create_document(document_type, project)
+        except Exception as exc:  # noqa: BLE001 - GUI should show a readable failure
+            messagebox.showerror("Create Print-Ready File", f"PuzzleProof Studio could not create the file:\n{exc}")
+            return
+
+        if hasattr(self, "printing_output_text"):
+            self.printing_output_text.set(str(path))
         self.status_text.set(f"Print-ready file created: {path}")
-        messagebox.showinfo("Printing", f"Created print-ready file:\n{path}")
-        open_file(path)
+        messagebox.showinfo(
+            "Print-Ready File Created",
+            f"Created print-ready file:\n{path}\n\nOutput folder:\n{path.parent}",
+        )
+        open_file(
+            path,
+            "The file was created, but Windows could not open it automatically. "
+            "Please open the output folder manually.",
+        )
+        open_folder(path.parent)
 
     def generate_production_package(self):
-        project = self.save_project()
-        paths = self.printing.create_production_package(project)
-        self.status_text.set(f"Production package created with {len(paths)} files.")
-        messagebox.showinfo("Printing", f"Created {len(paths)} print-ready files in:\n{EXPORTS_DIR}")
+        if not self.validate_printing_fields():
+            return
+
+        try:
+            project = self.save_project()
+            paths = self.printing.create_production_package(project)
+        except Exception as exc:  # noqa: BLE001 - GUI should show a readable failure
+            messagebox.showerror("Create Production Package", f"PuzzleProof Studio could not create the production package:\n{exc}")
+            return
+
+        saved_paths = "\n".join(str(path) for path in paths)
+        if hasattr(self, "printing_output_text"):
+            self.printing_output_text.set(f"Production package:\n{saved_paths}")
+        self.status_text.set(f"Production package created with {len(paths)} files in {EXPORTS_DIR}.")
+        messagebox.showinfo(
+            "Production Package Created",
+            f"Created {len(paths)} print-ready files:\n{saved_paths}\n\nOutput folder:\n{EXPORTS_DIR}",
+        )
+        if paths:
+            open_file(
+                paths[0],
+                "The production package was created, but Windows could not open a file automatically. "
+                "Please open the output folder manually.",
+            )
         open_folder(EXPORTS_DIR)
 
     def copy_support_info(self):

@@ -3,7 +3,7 @@ PuzzleProof Studio FAQ
 Installation
 
 Q: How do I install PuzzleProof Studio on Windows?
-A: Unzip PuzzleProofStudio-v0.1.0-Windows.zip, open the PuzzleProofStudio folder, and double-click PuzzleProofStudio.exe. You do not need to install Python and you do not need to use PowerShell.
+A: Unzip PuzzleProofStudio-v0.1.3-Windows.zip, open the PuzzleProofStudio folder, and double-click PuzzleProofStudio.exe. You do not need to install Python and you do not need to use PowerShell.
 
 Q: What should I do if Windows SmartScreen appears?
 A: During Early Access, the app may be unsigned. Choose More Info, then Run Anyway only if the ZIP came directly from BayouFinds / Wonder Piece Studio.

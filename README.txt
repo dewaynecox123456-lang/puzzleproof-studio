@@ -1,5 +1,5 @@
 PuzzleProof Studio
-Version 0.1.0-EarlyAccess
+Version 0.1.3-SeanValidation
 
 PuzzleProof Studio is a desktop utility for the BayouFinds / Wonder Piece Studio artist-to-puzzle workflow. It helps track artwork approvals, project records, image exports, catalog metadata, and print-ready production documents.
 

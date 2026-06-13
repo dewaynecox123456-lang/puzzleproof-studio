@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="PuzzleProofStudio"
-ZIP_NAME="PuzzleProofStudio-v0.1.0-Windows.zip"
+ZIP_NAME="PuzzleProofStudio-v0.1.3-Windows.zip"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist/$APP_NAME"
 EXE_PATH="$DIST_DIR/$APP_NAME.exe"
@@ -32,6 +32,10 @@ for required in README.txt FAQ.txt INSTALL.txt LICENSE_SETUP.txt; do
   fi
   cp "$required" "$DIST_DIR/$required"
 done
+
+if [ -d "$DIST_DIR/_internal" ]; then
+  cp "VERSION" "$DIST_DIR/_internal/VERSION"
+fi
 
 mkdir -p "$DIST_DIR/exports" "$DIST_DIR/jobs" "$DIST_DIR/catalog" "$DIST_DIR/licenses" "$DIST_DIR/data/settings"
 cp "licenses/sample-license.json" "$DIST_DIR/licenses/sample-license.json"

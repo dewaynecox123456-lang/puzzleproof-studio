@@ -177,6 +177,19 @@ def open_folder(path):
         messagebox.showwarning("Open Folder", f"Could not open folder:\n{path}\n\n{exc}")
 
 
+def open_file(path):
+    path = Path(path)
+    try:
+        if sys.platform.startswith("win"):
+            os.startfile(str(path))  # noqa: S606 - user-requested local file open
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", str(path)])
+        else:
+            subprocess.Popen(["xdg-open", str(path)])
+    except OSError as exc:
+        messagebox.showwarning("Open File", f"Could not open file:\n{path}\n\n{exc}")
+
+
 def configure_logging():
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
     log_file = LOGS_DIR / f"puzzleproof-studio-{datetime.now():%Y%m%d-%H%M%S}.log"
@@ -672,7 +685,7 @@ class PuzzleProofApp:
     def _build_project_tab(self, notebook):
         tab = self._add_scrollable_tab(notebook, "Project", padding=10)
         form = ttk.LabelFrame(tab, text="Project Details", padding=10)
-        form.pack(fill="both", expand=True)
+        form.pack(fill="x")
 
         fields = (
             ("artist_name", "Artist Name"),
@@ -699,7 +712,7 @@ class PuzzleProofApp:
         ttk.Label(form, text="Project Notes").grid(row=6, column=0, sticky="nw", pady=(12, 4))
         self.notes_text = tk.Text(
             form,
-            height=6,
+            height=4,
             wrap="word",
             bg=THEME["white"],
             fg=THEME["text"],
@@ -714,15 +727,15 @@ class PuzzleProofApp:
 
         form.columnconfigure(1, weight=1)
         form.columnconfigure(3, weight=1)
-        form.rowconfigure(6, weight=1)
 
         ttk.Label(tab, text="Required before manufacturing: approved status, source artwork, copyright owner, and at least one export.", style="Muted.TLabel").pack(anchor="w", pady=(8, 0))
 
         buttons = ttk.Frame(tab)
-        buttons.pack(fill="x", pady=(10, 0))
+        buttons.pack(fill="x", pady=(12, 18))
         project_actions = (
             ("New Project", self.new_project),
             ("Save Project", lambda: self.save_project(show_confirmation=True)),
+            ("Send Project to Catalog", self.send_project_to_catalog),
             ("Open Project Folder", lambda: open_folder(self.current_project_folder())),
             ("Generate Artist Release", lambda: self.generate_print_document("Artist Release")),
             ("Mark Manufacturing Ready", self.mark_manufacturing_ready),
@@ -733,6 +746,7 @@ class PuzzleProofApp:
             ttk.Button(buttons, text=label, command=command).grid(row=row, column=column, sticky="ew", padx=(0 if column == 0 else 6, 0), pady=2)
         for column in range(3):
             buttons.columnconfigure(column, weight=1)
+        ttk.Frame(tab, height=12).pack(fill="x")
 
     def _build_image_tab(self, notebook):
         tab = self._add_scrollable_tab(notebook, "Image Conversion", padding=10)
@@ -1007,6 +1021,18 @@ class PuzzleProofApp:
             )
         return saved_project
 
+    def send_project_to_catalog(self):
+        project = self.save_project()
+        self.status_text.set(f"Project sent to catalog: {project.get('catalog_number', '')}")
+        messagebox.showinfo(
+            "Catalog Updated",
+            "Project added to catalog:\n"
+            f"{project.get('catalog_number', '')}\n\n"
+            f"Catalog file:\n{self.catalog.catalog_file}",
+        )
+        self.notebook.select(2)
+        self.refresh_catalog()
+
     def current_project_folder(self):
         project = self.collect_project()
         if project.get("project_folder"):
@@ -1120,12 +1146,14 @@ class PuzzleProofApp:
         path = self.printing.create_document(document_type, project)
         self.status_text.set(f"Print-ready file created: {path}")
         messagebox.showinfo("Printing", f"Created print-ready file:\n{path}")
+        open_file(path)
 
     def generate_production_package(self):
         project = self.save_project()
         paths = self.printing.create_production_package(project)
         self.status_text.set(f"Production package created with {len(paths)} files.")
         messagebox.showinfo("Printing", f"Created {len(paths)} print-ready files in:\n{EXPORTS_DIR}")
+        open_folder(EXPORTS_DIR)
 
     def copy_support_info(self):
         text = format_support_info(self.support_info)

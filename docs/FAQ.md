@@ -4,7 +4,7 @@
 
 ### How do I install PuzzleProof Studio on Windows?
 
-Unzip `PuzzleProofStudio-v0.1.0-Windows.zip`, open the `PuzzleProofStudio` folder, and double-click `PuzzleProofStudio.exe`. You do not need to install Python and you do not need to use PowerShell.
+Unzip `PuzzleProofStudio-v0.1.3-Windows.zip`, open the `PuzzleProofStudio` folder, and double-click `PuzzleProofStudio.exe`. You do not need to install Python and you do not need to use PowerShell.
 
 ### What should I do if Windows SmartScreen appears?
 

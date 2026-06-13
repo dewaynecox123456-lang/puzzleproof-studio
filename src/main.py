@@ -166,7 +166,7 @@ DEFAULT_FAQ = {
 def display_version(version):
     version = str(version).strip()
     if not version:
-        return "v0.1.0-EarlyAccess"
+        return "v0.1.3-SeanValidation"
     return version if version.lower().startswith("v") else f"v{version}"
 
 

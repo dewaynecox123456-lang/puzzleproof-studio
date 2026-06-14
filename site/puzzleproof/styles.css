@@ -536,8 +536,26 @@ form,
   border-top: 1px solid var(--line);
 }
 
+.screenshot-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.screenshot-badges span {
+  border: 1px solid rgba(214, 163, 69, 0.46);
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(255, 251, 241, 0.78);
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
 .carousel {
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 .carousel-viewport {

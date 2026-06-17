@@ -223,6 +223,16 @@ h3 {
   font-size: 1.05rem;
 }
 
+.credibility-line {
+  display: inline-flex;
+  margin: 4px 0 0;
+  border-left: 4px solid var(--gold);
+  padding: 10px 14px;
+  background: rgba(209, 162, 74, 0.12);
+  color: var(--green-dark);
+  font-weight: 900;
+}
+
 .cta-row,
 .link-list {
   display: flex;
@@ -286,6 +296,8 @@ button:hover,
 .beyond-card,
 .beyond-cta,
 .roadmap-card,
+.ux-update-panel,
+.workflow-solutions-bridge,
 .faq-grid article,
 .intake-note,
 .team-grid article,
@@ -449,11 +461,47 @@ form,
   min-height: 170px;
 }
 
+.ux-update {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1fr);
+  gap: 32px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.ux-update .section-intro {
+  max-width: 720px;
+}
+
+.workflow-copy {
+  margin: 28px 0 0;
+  border-left: 5px solid var(--gold);
+  border-radius: 10px;
+  padding: 16px 18px;
+  background:
+    linear-gradient(135deg, rgba(209, 162, 74, 0.18), rgba(255, 255, 255, 0.82)),
+    var(--panel);
+  color: var(--green-dark);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 900;
+}
+
+.ux-update-panel {
+  border-radius: 10px;
+  padding: 22px;
+}
+
+.ux-update-panel .compact-list {
+  margin-top: 0;
+}
+
 .workflow-band,
 .validation-partner,
 .beyond-puzzles,
 .roadmap-section,
-.download-panel {
+.download-panel,
+.workflow-solutions-bridge {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -1029,6 +1077,42 @@ figcaption {
   text-align: center;
 }
 
+.workflow-solutions-bridge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.34fr);
+  gap: 28px;
+  align-items: center;
+  border-left: 5px solid var(--gold);
+  border-radius: 14px;
+  padding: clamp(24px, 5vw, 38px);
+  background:
+    linear-gradient(135deg, rgba(209, 162, 74, 0.18), rgba(255, 255, 255, 0.96)),
+    var(--panel);
+}
+
+.workflow-solutions-bridge p {
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.workflow-solutions-bridge p:last-child {
+  margin-bottom: 0;
+}
+
+.bridge-kicker {
+  color: var(--green-dark);
+  font-weight: 900;
+}
+
+.bridge-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.bridge-actions .button {
+  width: 100%;
+}
+
 .contact-block {
   border-top: 1px solid var(--line);
   text-align: center;
@@ -1274,8 +1358,10 @@ textarea {
 @media (max-width: 820px) {
   .hero,
   .early-access,
+  .ux-update,
   .workflow-band,
   .download-panel,
+  .workflow-solutions-bridge,
   .intake-promo,
   .team,
   .access,
@@ -1373,7 +1459,8 @@ textarea {
   }
 
   .cta-row,
-  .link-list {
+  .link-list,
+  .bridge-actions {
     align-items: stretch;
     flex-direction: column;
   }

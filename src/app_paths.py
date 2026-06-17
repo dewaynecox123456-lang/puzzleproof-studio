@@ -29,6 +29,7 @@ BUNDLED_LICENSES_DIR = RESOURCE_ROOT / "licenses"
 TEMPLATES_DIR = RESOURCE_ROOT / "assets" / "templates"
 SAMPLE_IMAGES_DIR = RESOURCE_ROOT / "assets" / "sample-images"
 ICONS_DIR = RESOURCE_ROOT / "assets" / "icons"
+BRANDING_DIR = RESOURCE_ROOT / "assets" / "branding"
 LINUX_ICON_FILE = ICONS_DIR / "puzzleproof-icon.xbm"
 
 

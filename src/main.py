@@ -15,7 +15,10 @@ except ModuleNotFoundError:
     messagebox = None
     ttk = None
 
+from PIL import Image, ImageTk
+
 from app_paths import (
+    BRANDING_DIR,
     EXPORTS_DIR,
     JOBS_DIR,
     LINUX_ICON_FILE,
@@ -161,12 +164,17 @@ DEFAULT_FAQ = {
         ),
     ],
 }
+LOGO_ART = BRANDING_DIR / "puzzleproof_logo_v2.png"
+HEADER_ART = BRANDING_DIR / "puzzleproof_header_v2.png"
+SPLASH_ART = BRANDING_DIR / "puzzleproof_splash_v2.png"
+ABOUT_ART = BRANDING_DIR / "puzzleproof_about_v2.png"
+WORKFLOW_DOCX_ART = BRANDING_DIR / "workflow_export_docx_v2.png"
 
 
 def display_version(version):
     version = str(version).strip()
     if not version:
-        return "v0.1.3-SeanValidation"
+        return "v0.1.3.1-SeanValidation"
     return version if version.lower().startswith("v") else f"v{version}"
 
 
@@ -181,8 +189,8 @@ def open_folder(path):
         else:
             subprocess.Popen(["xdg-open", str(path)])
         return True
-    except OSError:
-        messagebox.showwarning("Open Folder", f"Could not open this folder automatically:\n{path}\n\nPlease open it manually.")
+    except OSError as exc:
+        messagebox.showwarning("Open Folder", f"Could not open this folder automatically:\n{path}\n\nPlease open it manually.\n\nError: {exc}")
         return False
 
 
@@ -196,10 +204,11 @@ def open_file(path, fallback_message=None):
         else:
             subprocess.Popen(["xdg-open", str(path)])
         return True
-    except OSError:
+    except OSError as exc:
+        message = fallback_message or f"Could not open this file automatically:\n{path}\n\nPlease open it manually."
         messagebox.showwarning(
             "Open File",
-            fallback_message or f"Could not open this file automatically:\n{path}\n\nPlease open it manually.",
+            f"{message}\n\nError: {exc}",
         )
         return False
 
@@ -231,6 +240,7 @@ class PuzzleProofApp:
         self.images = ImageProcessor()
         self.printing = PrintManager()
         self.display_version = display_version(self.version)
+        self.brand_images = []
         self.source_image = tk.StringVar()
         self.license_text = tk.StringVar(value=f"License: {self.license_status.display}")
         self.status_text = tk.StringVar(value="Ready.")
@@ -321,20 +331,37 @@ class PuzzleProofApp:
         style.configure("Splash.Horizontal.TProgressbar", troughcolor=THEME["panel_alt"], background=THEME["gold"], bordercolor=THEME["border"], lightcolor=THEME["gold"], darkcolor=THEME["gold"])
         style.configure("AboutTitle.TLabel", background=THEME["ivory"], foreground=THEME["green"], font=("TkDefaultFont", 16, "bold"))
 
+    def _load_brand_image(self, path, size):
+        if not path.exists():
+            return None
+        try:
+            image = Image.open(path).convert("RGBA")
+            image.thumbnail(size, Image.Resampling.LANCZOS)
+            photo = ImageTk.PhotoImage(image)
+        except Exception as exc:  # noqa: BLE001 - artwork is optional and should not block the app
+            LOGGER.warning("Could not load brand artwork %s: %s", path, exc)
+            return None
+        self.brand_images.append(photo)
+        return photo
+
     def _show_splash_then_main(self):
         self.splash = tk.Toplevel(self.root)
         self.splash.overrideredirect(True)
         self.splash.configure(bg=THEME["green"])
-        self.splash.geometry("680x460")
+        self.splash.geometry("720x520")
         self.splash.update_idletasks()
-        self._center_splash(680, 460)
+        self._center_splash(720, 520)
 
         frame = ttk.Frame(self.splash, padding=8, style="Splash.TFrame")
         frame.pack(fill="both", expand=True)
         inner = ttk.Frame(frame, padding=(30, 24, 30, 0), style="SplashCream.TFrame")
         inner.pack(fill="both", expand=True)
 
-        self._draw_splash_puzzle_icon(inner, size=112).pack(anchor="center", pady=(0, 12))
+        splash_image = self._load_brand_image(SPLASH_ART, (640, 230))
+        if splash_image:
+            ttk.Label(inner, image=splash_image).pack(anchor="center", pady=(0, 12))
+        else:
+            self._draw_splash_puzzle_icon(inner, size=112).pack(anchor="center", pady=(0, 12))
         ttk.Label(inner, text=APP_NAME, style="SplashTitle.TLabel").pack(anchor="center")
         ttk.Label(inner, text="Professional Puzzle Production Suite", style="SplashSubtitle.TLabel").pack(anchor="center", pady=(4, 0))
 
@@ -374,9 +401,10 @@ class PuzzleProofApp:
         progress.pack(anchor="center", pady=(8, 14))
         progress.start(14)
 
-        footer_canvas = tk.Canvas(inner, height=58, bg=THEME["green"], highlightthickness=0, bd=0)
-        footer_canvas.pack(fill="x", side="bottom")
-        self._draw_bayou_footer(footer_canvas)
+        if not splash_image:
+            footer_canvas = tk.Canvas(inner, height=58, bg=THEME["green"], highlightthickness=0, bd=0)
+            footer_canvas.pack(fill="x", side="bottom")
+            self._draw_bayou_footer(footer_canvas)
         footer = ttk.Frame(inner, padding=(12, 7), style="SplashFooter.TFrame")
         footer.pack(fill="x", side="bottom")
         ttk.Label(footer, text="BayouFinds / Wonder Piece Studio", style="SplashFooter.TLabel").pack(side="left")
@@ -460,13 +488,20 @@ class PuzzleProofApp:
         header = ttk.Frame(container, style="Header.TFrame", padding=(14, 10))
         header.pack(fill="x", pady=(0, 8))
 
-        self._draw_brand_mark(header, size=54, background=THEME["green"]).pack(side="left", padx=(0, 12))
+        logo_image = self._load_brand_image(LOGO_ART, (58, 58))
+        if logo_image:
+            tk.Label(header, image=logo_image, bg=THEME["green"], bd=0, highlightthickness=0).pack(side="left", padx=(0, 12))
+        else:
+            self._draw_brand_mark(header, size=54, background=THEME["green"]).pack(side="left", padx=(0, 12))
 
         title_group = ttk.Frame(header, style="Header.TFrame")
         title_group.pack(side="left", fill="x", expand=True)
         ttk.Label(title_group, text=BRAND_LINE.upper(), style="HeaderEyebrow.TLabel").pack(anchor="w")
         ttk.Label(title_group, text=APP_NAME, style="HeaderTitle.TLabel").pack(anchor="w", pady=(2, 0))
         ttk.Label(title_group, text=f"{SUBTITLE} | {self.display_version}", style="HeaderMeta.TLabel").pack(anchor="w", pady=(4, 0))
+        header_image = self._load_brand_image(HEADER_ART, (330, 72))
+        if header_image:
+            tk.Label(header, image=header_image, bg=THEME["green"], bd=0, highlightthickness=0).pack(side="left", padx=(16, 0))
         ttk.Label(header, textvariable=self.license_text, style="License.TLabel").pack(side="right", padx=(16, 0))
 
         self.notebook = ttk.Notebook(container)
@@ -814,7 +849,10 @@ class PuzzleProofApp:
         ttk.Label(summary, textvariable=self.last_output_format).pack(anchor="w", pady=(3, 0))
         ttk.Label(summary, textvariable=self.last_output_printer).pack(anchor="w", pady=(3, 0))
         ttk.Label(summary, textvariable=self.last_output_path, wraplength=820, justify="left").pack(anchor="w", pady=(3, 8))
-        ttk.Button(summary, text="Open Output Folder", command=self.open_latest_output_folder).pack(anchor="w")
+        output_actions = ttk.Frame(summary)
+        output_actions.pack(anchor="w")
+        ttk.Button(output_actions, text="Open Latest Export", command=self.open_latest_export).pack(side="left")
+        ttk.Button(output_actions, text="Open Output Folder", command=self.open_latest_output_folder).pack(side="left", padx=(8, 0))
         self.sample_label = ttk.Label(tab, text=self.sample_artwork_status(), padding=(0, 12, 0, 0))
         self.sample_label.pack(anchor="w")
 
@@ -998,11 +1036,21 @@ class PuzzleProofApp:
         tab = self._add_scrollable_tab(notebook, "About", padding=12)
         header = ttk.Frame(tab)
         header.pack(anchor="nw", fill="x", pady=(0, 14))
-        self._draw_brand_mark(header, size=64).pack(side="left", padx=(0, 14))
+        logo_image = self._load_brand_image(LOGO_ART, (70, 70))
+        if logo_image:
+            ttk.Label(header, image=logo_image).pack(side="left", padx=(0, 14))
+        else:
+            self._draw_brand_mark(header, size=64).pack(side="left", padx=(0, 14))
         title_block = ttk.Frame(header)
         title_block.pack(side="left", fill="x", expand=True)
         ttk.Label(title_block, text=APP_NAME, style="AboutTitle.TLabel").pack(anchor="w")
         ttk.Label(title_block, text=f"{SUBTITLE} | {self.display_version}", style="Muted.TLabel").pack(anchor="w", pady=(3, 0))
+        about_image = self._load_brand_image(ABOUT_ART, (880, 280))
+        if about_image:
+            ttk.Label(tab, image=about_image).pack(anchor="nw", fill="x", pady=(0, 12))
+        workflow_image = self._load_brand_image(WORKFLOW_DOCX_ART, (880, 260))
+        if workflow_image:
+            ttk.Label(tab, image=workflow_image).pack(anchor="nw", fill="x", pady=(0, 14))
         text = (
             "Built for Sean's artist-to-puzzle workflow.\n\n"
             "Developed by BayouFinds / Wonder Piece Studio.\n\n"
@@ -1093,6 +1141,61 @@ class PuzzleProofApp:
             return
         open_folder(EXPORTS_DIR)
 
+    def open_latest_export(self):
+        if not self.last_output_file:
+            messagebox.showinfo("Open Latest Export", "No export has been created yet.")
+            return
+        open_file(
+            self.last_output_file,
+            f"Could not open the latest export automatically:\n{self.last_output_file}\n\nPlease open it manually.",
+        )
+
+    def show_export_success_dialog(self, export_type, output_format, output_path):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Export Complete")
+        dialog.transient(self.root)
+        dialog.resizable(False, False)
+        dialog.configure(bg=THEME["ivory"])
+
+        content = ttk.Frame(dialog, padding=16)
+        content.pack(fill="both", expand=True)
+        ttk.Label(content, text="Export Complete", style="AboutTitle.TLabel").pack(anchor="w")
+
+        details = ttk.Frame(content)
+        details.pack(fill="x", pady=(12, 10))
+        rows = (
+            ("Export type", export_type),
+            ("Format", output_format),
+            ("Saved file path", str(output_path)),
+        )
+        for row, (label, value) in enumerate(rows):
+            ttk.Label(details, text=f"{label}:").grid(row=row, column=0, sticky="nw", pady=3)
+            ttk.Label(details, text=value, wraplength=560, justify="left").grid(row=row, column=1, sticky="w", padx=(10, 0), pady=3)
+        details.columnconfigure(1, weight=1)
+
+        actions = ttk.Frame(content)
+        actions.pack(fill="x", pady=(6, 0))
+        ttk.Button(
+            actions,
+            text="Open File",
+            command=lambda: open_file(
+                output_path,
+                f"Could not open this export automatically:\n{output_path}\n\nPlease open it manually.",
+            ),
+        ).pack(side="left")
+        ttk.Button(actions, text="Open Exports Folder", command=lambda: open_folder(Path(output_path).parent)).pack(side="left", padx=(8, 0))
+        ttk.Button(actions, text="OK", command=dialog.destroy).pack(side="right")
+
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        x = self.root.winfo_rootx() + max((self.root.winfo_width() - width) // 2, 0)
+        y = self.root.winfo_rooty() + max((self.root.winfo_height() - height) // 2, 0)
+        dialog.geometry(f"+{x}+{y}")
+        dialog.grab_set()
+        dialog.focus_set()
+        self.root.wait_window(dialog)
+
     def export_image(self):
         if not self.source_image.get():
             messagebox.showwarning("Image Conversion", "Import a source image before exporting.")
@@ -1113,20 +1216,12 @@ class PuzzleProofApp:
         self.export_files = list(dict.fromkeys(getattr(self, "export_files", []) + [str(output_path)]))
         preset = self.export_type.get()
         output_format = self.export_format.get()
-        suggested_printer = PRINTER_GUIDANCE.get(preset, "Review output preset")
         self.last_output_file = output_path
         self.last_output_path.set(f"Saved file path: {output_path}")
         self.update_export_summary()
         self.save_project()
         self.status_text.set(f"Export created: {output_path}")
-        messagebox.showinfo(
-            "Export Created",
-            "Export created:\n"
-            f"{preset}\n"
-            f"Format: {output_format}\n"
-            f"Saved to: {output_path}\n"
-            f"Suggested printer: {suggested_printer}",
-        )
+        self.show_export_success_dialog(preset, output_format, output_path)
 
     def mark_manufacturing_ready(self):
         project = self.collect_project()

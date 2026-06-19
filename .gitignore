@@ -24,3 +24,13 @@ dist/
 
 # Release artifacts
 release/*.zip
+
+# BayouFinds release artifacts / local licenses
+release/
+dist/
+build/
+*.zip
+*.exe
+*.msi
+license.json
+*/license.json

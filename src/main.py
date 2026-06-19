@@ -30,7 +30,7 @@ from app_paths import (
     get_version,
 )
 from catalog_manager import CatalogManager
-from image_processor import EXPORT_TARGETS, OUTPUT_FORMATS, ImageProcessor
+from image_processor import EXPORT_TARGETS, FILL_PUZZLE_AREA, FIT_ENTIRE_ARTWORK, IMAGE_PLACEMENT_MODES, OUTPUT_FORMATS, ImageProcessor
 from license_manager import LicenseManager
 from print_manager import PrintManager
 from project_manager import ProjectManager
@@ -174,7 +174,7 @@ WORKFLOW_DOCX_ART = BRANDING_DIR / "workflow_export_docx_v2.png"
 def display_version(version):
     version = str(version).strip()
     if not version:
-        return "v0.1.3.1-SeanValidation"
+        return "v0.1.3.2-SeanValidation"
     return version if version.lower().startswith("v") else f"v{version}"
 
 
@@ -816,8 +816,10 @@ class PuzzleProofApp:
         options.pack(fill="x", pady=10)
         self.export_type = tk.StringVar(value="Puzzle Print")
         self.export_format = tk.StringVar(value="DOCX")
+        self.image_placement_mode = tk.StringVar(value=FIT_ENTIRE_ARTWORK)
         self.last_output_preset = tk.StringVar(value="Selected output preset: Puzzle Print")
         self.last_output_format = tk.StringVar(value="Output format: DOCX")
+        self.last_output_mode = tk.StringVar(value=f"Artwork placement: {FIT_ENTIRE_ARTWORK}")
         self.last_output_path = tk.StringVar(value="Saved file path: Not exported yet")
         self.last_output_printer = tk.StringVar(value=f"Suggested printer: {PRINTER_GUIDANCE['Puzzle Print']}")
         self.last_output_file = None
@@ -829,6 +831,7 @@ class PuzzleProofApp:
         rows = (
             ("Output Preset", ttk.Combobox(options, textvariable=self.export_type, values=tuple(EXPORT_TARGETS.keys()), state="readonly")),
             ("Output Format", ttk.Combobox(options, textvariable=self.export_format, values=OUTPUT_FORMATS, state="readonly")),
+            ("Artwork Placement", ttk.Combobox(options, textvariable=self.image_placement_mode, values=IMAGE_PLACEMENT_MODES, state="readonly")),
             ("Copyright Text", ttk.Entry(options, textvariable=self.copyright_text)),
             ("Placement", ttk.Combobox(options, textvariable=self.placement, values=PLACEMENTS, state="readonly")),
             ("Font Size", ttk.Spinbox(options, from_=14, to=96, textvariable=self.font_size)),
@@ -841,12 +844,14 @@ class PuzzleProofApp:
 
         self.export_type.trace_add("write", self.update_export_summary)
         self.export_format.trace_add("write", self.update_export_summary)
+        self.image_placement_mode.trace_add("write", self.update_export_summary)
 
-        ttk.Button(tab, text="Apply Preset Crop/Resize and Export", command=self.export_image).pack(anchor="w")
+        ttk.Button(tab, text="Prepare Preset Output and Export", command=self.export_image).pack(anchor="w")
         summary = ttk.LabelFrame(tab, text="Latest Output", padding=10)
         summary.pack(fill="x", pady=(10, 0))
         ttk.Label(summary, textvariable=self.last_output_preset).pack(anchor="w")
         ttk.Label(summary, textvariable=self.last_output_format).pack(anchor="w", pady=(3, 0))
+        ttk.Label(summary, textvariable=self.last_output_mode).pack(anchor="w", pady=(3, 0))
         ttk.Label(summary, textvariable=self.last_output_printer).pack(anchor="w", pady=(3, 0))
         ttk.Label(summary, textvariable=self.last_output_path, wraplength=820, justify="left").pack(anchor="w", pady=(3, 8))
         output_actions = ttk.Frame(summary)
@@ -1076,6 +1081,8 @@ class PuzzleProofApp:
         self.project_vars["project_origin"].set("Artist Submission")
         self.notes_text.delete("1.0", "end")
         self.source_image.set("")
+        if hasattr(self, "image_placement_mode"):
+            self.image_placement_mode.set(FIT_ENTIRE_ARTWORK)
         self.export_files = []
         if hasattr(self, "last_output_path"):
             self.last_output_path.set("Saved file path: Not exported yet")
@@ -1133,6 +1140,7 @@ class PuzzleProofApp:
         preset = self.export_type.get()
         self.last_output_preset.set(f"Selected output preset: {preset}")
         self.last_output_format.set(f"Output format: {self.export_format.get()}")
+        self.last_output_mode.set(f"Artwork placement: {self.image_placement_mode.get()}")
         self.last_output_printer.set(f"Suggested printer: {PRINTER_GUIDANCE.get(preset, 'Review output preset')}")
 
     def open_latest_output_folder(self):
@@ -1150,7 +1158,7 @@ class PuzzleProofApp:
             f"Could not open the latest export automatically:\n{self.last_output_file}\n\nPlease open it manually.",
         )
 
-    def show_export_success_dialog(self, export_type, output_format, output_path):
+    def show_export_success_dialog(self, export_type, output_format, image_placement_mode, output_path):
         dialog = tk.Toplevel(self.root)
         dialog.title("Export Complete")
         dialog.transient(self.root)
@@ -1166,6 +1174,7 @@ class PuzzleProofApp:
         rows = (
             ("Export type", export_type),
             ("Format", output_format),
+            ("Artwork placement", image_placement_mode),
             ("Saved file path", str(output_path)),
         )
         for row, (label, value) in enumerate(rows):
@@ -1200,6 +1209,11 @@ class PuzzleProofApp:
         if not self.source_image.get():
             messagebox.showwarning("Image Conversion", "Import a source image before exporting.")
             return
+        image_placement_mode = self.image_placement_mode.get()
+        if image_placement_mode == FILL_PUZZLE_AREA:
+            if not messagebox.askyesno("Crop Artwork", "This mode may crop parts of the artwork. Continue?"):
+                self.status_text.set("Export canceled before crop-to-fill output.")
+                return
         try:
             output_path = self.images.export(
                 self.source_image.get(),
@@ -1209,6 +1223,7 @@ class PuzzleProofApp:
                 self.placement.get(),
                 self.opacity.get(),
                 self.font_size.get(),
+                image_placement_mode,
             )
         except Exception as exc:  # noqa: BLE001 - GUI should report and continue
             messagebox.showerror("Image Conversion", str(exc))
@@ -1220,8 +1235,8 @@ class PuzzleProofApp:
         self.last_output_path.set(f"Saved file path: {output_path}")
         self.update_export_summary()
         self.save_project()
-        self.status_text.set(f"Export created: {output_path}")
-        self.show_export_success_dialog(preset, output_format, output_path)
+        self.status_text.set(f"Export created: {output_path} | Artwork placement: {image_placement_mode}")
+        self.show_export_success_dialog(preset, output_format, image_placement_mode, output_path)
 
     def mark_manufacturing_ready(self):
         project = self.collect_project()

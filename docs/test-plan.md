@@ -75,17 +75,20 @@ Steps:
 1. Open the Image Conversion tab.
 2. Import one PNG or JPG customer image.
 3. Confirm the default output format is `DOCX`.
-4. Select `Puzzle Print`, choose `DOCX`, and export.
-5. Verify the export success details show `Puzzle Print`, `DOCX`, the full saved path, and `Sublimation printer / sublimation paper`.
-6. Select `Box Insert`, choose `DOCX`, and export.
-7. Verify the export success details show `Box Insert`, `DOCX`, the full saved path, and `Standard printer / regular paper`.
-8. Select `Box Sticker / Label`, choose `DOCX`, and export.
-9. Verify the export success details show `Box Sticker / Label`, `DOCX`, the full saved path, and `Sticker paper or label printer`.
-10. Verify all three DOCX files are created in `exports/`.
-11. Verify the DOCX files open in Microsoft Word on Windows.
-12. Choose `PNG` or `JPG` for one preset and confirm image output is created for direct image workflows.
-13. Click Open Output Folder and confirm it opens the generated file's folder or the `exports/` folder.
-14. Confirm the output folder is clear and contains the generated preset files.
+4. Confirm the default artwork placement is `Fit Entire Artwork / Preserve Full Image`.
+5. Import a portrait or mismatched-aspect image and export `Puzzle Print` as `DOCX`.
+6. Verify the output preserves the full artwork. Letterboxing or borders are acceptable; unseen artwork must not be lost.
+7. Verify the export success details show `Puzzle Print`, `DOCX`, the artwork placement mode, the full saved path, and `Sublimation printer / sublimation paper`.
+8. Select `Box Insert`, choose `DOCX`, and export.
+9. Verify the export success details show `Box Insert`, `DOCX`, the artwork placement mode, the full saved path, and `Standard printer / regular paper`.
+10. Select `Box Sticker / Label`, choose `DOCX`, and export.
+11. Verify the export success details show `Box Sticker / Label`, `DOCX`, the artwork placement mode, the full saved path, and `Sticker paper or label printer`.
+12. Verify all three DOCX files are created in `exports/`.
+13. Verify the DOCX files open in Microsoft Word on Windows.
+14. Choose `PNG` or `JPG` for one preset and confirm image output also preserves the full artwork in fit mode.
+15. Select `Fill Puzzle Area / Crop to Fill`, export one test file, and confirm the app warns: `This mode may crop parts of the artwork. Continue?`
+16. Click Open File, Open Latest Export, and Open Output Folder and confirm each action works.
+17. Confirm the output folder is clear and contains the generated preset files.
 
 Note: The Word check validates DOCX transition compatibility only. The core workflow requirement is preset-based output generation that removes repeated resizing, cropping, and positioning.
 

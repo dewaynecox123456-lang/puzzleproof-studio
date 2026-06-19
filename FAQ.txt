@@ -3,7 +3,7 @@ PuzzleProof Studio FAQ
 Installation
 
 Q: How do I install PuzzleProof Studio on Windows?
-A: Unzip PuzzleProofStudio-v0.1.3-Windows.zip, open the PuzzleProofStudio folder, and double-click PuzzleProofStudio.exe. You do not need to install Python and you do not need to use PowerShell.
+A: Unzip PuzzleProofStudio-v0.1.3.2-Windows.zip, open the PuzzleProofStudio folder, and double-click PuzzleProofStudio.exe. You do not need to install Python and you do not need to use PowerShell.
 
 Q: What should I do if Windows SmartScreen appears?
 A: During Early Access, the app may be unsigned. Choose More Info, then Run Anyway only if the ZIP came directly from BayouFinds / Wonder Piece Studio.
@@ -32,7 +32,10 @@ A: Project JSON files are saved in the jobs folder. Catalog metadata is saved in
 Artwork
 
 Q: How do I import artwork?
-A: Open the Image Conversion tab, choose the source artwork file, select the export target, then run the export action.
+A: Open the Image Conversion tab, choose the source artwork file, select the export target, confirm the artwork placement mode, then run the export action. The default mode is Fit Entire Artwork / Preserve Full Image so portrait or mismatched-aspect artwork is not cropped.
+
+Q: Why does my export have borders or letterboxing?
+A: Fit Entire Artwork / Preserve Full Image keeps the full source artwork visible. Borders or letterboxing are expected when the source artwork shape does not match the selected output preset. Use Fill Puzzle Area / Crop to Fill only when you intentionally accept cropped artwork.
 
 Q: My artwork import or export failed. What should I check?
 A: Confirm the source image still exists, the file is a supported image format, and the app has permission to write into the exports folder.

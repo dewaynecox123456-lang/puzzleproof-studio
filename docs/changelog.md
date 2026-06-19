@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3.2-SeanValidation
+
+- Defaulted artwork placement to `Fit Entire Artwork / Preserve Full Image`.
+- Preserved the full source artwork for DOCX, PNG, and JPG exports when artwork aspect ratio does not match the selected production preset.
+- Kept `Fill Puzzle Area / Crop to Fill` available for intentional crop-to-fill output.
+- Added a warning before crop-to-fill export: `This mode may crop parts of the artwork. Continue?`
+- Added artwork placement mode to export summary, status output, and the Export Complete dialog.
+- Added `scripts/validate_crop_safe_export.py` to verify crop-safe PNG and DOCX fit exports.
+
 ## 0.1.2-Candidate
 
 - Status: Feature Complete.

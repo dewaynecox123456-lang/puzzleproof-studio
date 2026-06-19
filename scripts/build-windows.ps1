@@ -12,7 +12,7 @@ $PythonExe = Join-Path $VenvDir "Scripts\python.exe"
 $AppName = "PuzzleProofStudio"
 $ExePath = Join-Path $RootDir "dist\$AppName\$AppName.exe"
 $ReleaseDir = Join-Path $RootDir "release"
-$ZipPath = Join-Path $ReleaseDir "PuzzleProofStudio-v0.1.3-Windows.zip"
+$ZipPath = Join-Path $ReleaseDir "PuzzleProofStudio-v0.1.3.2-Windows.zip"
 
 Set-Location $RootDir
 
@@ -39,6 +39,7 @@ if (-not $SkipInstall) {
 
 Write-Host "Checking Python syntax..."
 & $PythonExe -m py_compile "src\main.py"
+& $PythonExe -m py_compile "src\image_processor.py"
 
 $addData = @(
     @("VERSION", "."),

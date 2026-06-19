@@ -25,6 +25,9 @@ EXPORT_ALIASES = {
 }
 IMAGE_FORMATS = ("PNG", "JPG")
 OUTPUT_FORMATS = IMAGE_FORMATS + ("DOCX",)
+FIT_ENTIRE_ARTWORK = "Fit Entire Artwork / Preserve Full Image"
+FILL_PUZZLE_AREA = "Fill Puzzle Area / Crop to Fill"
+IMAGE_PLACEMENT_MODES = (FIT_ENTIRE_ARTWORK, FILL_PUZZLE_AREA)
 EMU_PER_INCH = 914400
 
 
@@ -32,7 +35,17 @@ class ImageProcessor:
     def available(self):
         return Image is not None
 
-    def export(self, source_path, export_type, output_format, copyright_text="", placement="Bottom Right", opacity=180, font_size=42):
+    def export(
+        self,
+        source_path,
+        export_type,
+        output_format,
+        copyright_text="",
+        placement="Bottom Right",
+        opacity=180,
+        font_size=42,
+        image_placement_mode=FIT_ENTIRE_ARTWORK,
+    ):
         if Image is None:
             raise RuntimeError("Pillow is required for image conversion. Install requirements first.")
 
@@ -44,13 +57,19 @@ class ImageProcessor:
             output_format = "JPG"
         if output_format not in OUTPUT_FORMATS:
             raise ValueError(f"Unsupported output format: {output_format}")
+        if image_placement_mode not in IMAGE_PLACEMENT_MODES:
+            raise ValueError(f"Unsupported image placement mode: {image_placement_mode}")
         suffix = output_format.lower()
 
         EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
         output_path = EXPORTS_DIR / f"{source_path.stem}-{target['slug']}.{suffix}"
 
         with Image.open(source_path) as image:
-            converted = self._fit_center_crop(image.convert("RGBA"), target["pixels"])
+            source_image = image.convert("RGBA")
+            if image_placement_mode == FILL_PUZZLE_AREA:
+                converted = self._fit_center_crop(source_image, target["pixels"])
+            else:
+                converted = self._fit_entire_image(source_image, target["pixels"])
             if copyright_text:
                 converted = self._draw_copyright(converted, copyright_text, placement, opacity, font_size)
             if output_format == "DOCX":
@@ -70,6 +89,17 @@ class ImageProcessor:
         left = (resized.width - target_w) // 2
         top = (resized.height - target_h) // 2
         return resized.crop((left, top, left + target_w, top + target_h))
+
+    def _fit_entire_image(self, image, target_size):
+        target_w, target_h = target_size
+        source_w, source_h = image.size
+        scale = min(target_w / source_w, target_h / source_h)
+        resized = image.resize((round(source_w * scale), round(source_h * scale)), Image.LANCZOS)
+        output = Image.new("RGBA", target_size, (255, 255, 255, 255))
+        left = (target_w - resized.width) // 2
+        top = (target_h - resized.height) // 2
+        output.alpha_composite(resized, (left, top))
+        return output
 
     def _draw_copyright(self, image, text, placement, opacity, font_size):
         overlay = Image.new("RGBA", image.size, (255, 255, 255, 0))

@@ -1,6 +1,6 @@
 # Sean Test Release Checklist
 
-Package target: `puzzleproof-studio-v0.1.0-build3.1-sean-test.zip`
+Package target: `PuzzleProofStudio-v0.1.3.2-Windows.zip`
 
 ## Before Sending
 
@@ -31,6 +31,10 @@ Package target: `puzzleproof-studio-v0.1.0-build3.1-sean-test.zip`
 7. Search the Catalog by Artist Name, Artwork Title, and Catalog ID.
 8. Generate one print-ready HTML file.
 9. Use Open Exports Folder to find the generated file.
+10. In Image Conversion, confirm DOCX is the default output format.
+11. Confirm artwork placement defaults to `Fit Entire Artwork / Preserve Full Image`.
+12. Export a portrait or mismatched-aspect image to DOCX and confirm the full artwork is visible.
+13. Select `Fill Puzzle Area / Crop to Fill` and confirm the crop warning appears before export.
 
 ## Windows Handoff
 

@@ -4,7 +4,7 @@
 
 ### How do I install PuzzleProof Studio on Windows?
 
-Unzip `PuzzleProofStudio-v0.1.3-Windows.zip`, open the `PuzzleProofStudio` folder, and double-click `PuzzleProofStudio.exe`. You do not need to install Python and you do not need to use PowerShell.
+Unzip `PuzzleProofStudio-v0.1.3.2-Windows.zip`, open the `PuzzleProofStudio` folder, and double-click `PuzzleProofStudio.exe`. You do not need to install Python and you do not need to use PowerShell.
 
 ### What should I do if Windows SmartScreen appears?
 
@@ -40,11 +40,15 @@ Project JSON files are saved in the `jobs` folder. Catalog metadata is saved in 
 
 ### How do I import artwork?
 
-Open the Image Conversion tab, choose the source artwork file, select the production output preset, choose PNG, JPG, or DOCX, then run the export action.
+Open the Image Conversion tab, choose the source artwork file, select the production output preset, choose PNG, JPG, or DOCX, confirm the artwork placement mode, then run the export action.
 
 DOCX is the default because it is available as transition comfort for users who are comfortable printing from Microsoft Word. PNG and JPG are available for direct image workflows. The main goal is eliminating repeated resizing, cropping, and positioning for Puzzle Print, Box Insert, and Box Sticker / Label outputs.
 
-After export, PuzzleProof shows the selected preset, output format, full saved path, suggested printer type, and an Open Output Folder button.
+### Why does my export have borders or letterboxing?
+
+`Fit Entire Artwork / Preserve Full Image` is the default artwork placement mode. It preserves the full source image when the artwork shape does not match the selected output preset. Borders or letterboxing are expected in this mode. Use `Fill Puzzle Area / Crop to Fill` only when you intentionally want the image to fill the whole production area and accept that parts of the artwork may be cropped.
+
+After export, PuzzleProof shows the selected preset, output format, artwork placement mode, full saved path, suggested printer type, and file/folder opening actions.
 
 Suggested printer guidance:
 

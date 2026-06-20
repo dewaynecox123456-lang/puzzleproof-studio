@@ -50,9 +50,9 @@ def get_version():
     try:
         value = VERSION_FILE.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
-        return "0.1.3.2-SeanValidation"
+        return "0.2.0-beta"
     for line in value.splitlines():
         line = line.strip()
         if line:
             return line
-    return "0.1.3.2-SeanValidation"
+    return "0.2.0-beta"

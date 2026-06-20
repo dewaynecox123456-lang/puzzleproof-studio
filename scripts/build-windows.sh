@@ -56,7 +56,7 @@ Expected output location:
 
 Release zip for Sean after Windows 10/11 smoke testing:
 
-  powershell Compress-Archive -Path dist\PuzzleProofStudio -DestinationPath PuzzleProofStudio-v0.1.3.2-Windows.zip -Force
+  powershell Compress-Archive -Path dist\PuzzleProofStudio -DestinationPath PuzzleProofStudio-v0.2.0-beta-windows.zip -Force
 
 Do not treat the Windows package as complete until it has launched on Windows
 10 and Windows 11, displayed an Active license, and rendered every tab.

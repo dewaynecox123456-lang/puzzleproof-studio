@@ -12,7 +12,7 @@ $PythonExe = Join-Path $VenvDir "Scripts\python.exe"
 $AppName = "PuzzleProofStudio"
 $ExePath = Join-Path $RootDir "dist\$AppName\$AppName.exe"
 $ReleaseDir = Join-Path $RootDir "release"
-$ZipPath = Join-Path $ReleaseDir "PuzzleProofStudio-v0.1.3.2-Windows.zip"
+$ZipPath = Join-Path $ReleaseDir "PuzzleProofStudio-v0.2.0-beta-windows.zip"
 
 Set-Location $RootDir
 

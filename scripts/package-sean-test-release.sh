@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="PuzzleProofStudio"
-ZIP_NAME="PuzzleProofStudio-v0.1.3.2-Windows.zip"
+ZIP_NAME="PuzzleProofStudio-v0.2.0-beta-windows.zip"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist/$APP_NAME"
 EXE_PATH="$DIST_DIR/$APP_NAME.exe"

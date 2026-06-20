@@ -1,9 +1,9 @@
 # PuzzleProof Studio
 
-Version: 0.1.3.2-SeanValidation
+Version: 0.2.0-beta
 
-v0.1.3.1 SeanValidation includes an export user experience update and refreshed application artwork.
-v0.1.3.2 SeanValidation makes export placement crop-safe by default. The Image Conversion tab now defaults to `Fit Entire Artwork / Preserve Full Image`, which preserves the full source artwork in DOCX, PNG, and JPG exports. `Fill Puzzle Area / Crop to Fill` remains available, but the app warns that it may crop parts of the artwork before continuing.
+v0.2.0 beta standardizes the release identity and promotes PuzzleProof Studio from Sean validation builds into a formal beta track.
+v0.2.0 beta keeps export placement crop-safe by default. The Image Conversion tab now defaults to `Fit Entire Artwork / Preserve Full Image`, which preserves the full source artwork in DOCX, PNG, and JPG exports. `Fill Puzzle Area / Crop to Fill` remains available, but the app warns that it may crop parts of the artwork before continuing.
 
 PuzzleProof Studio is a desktop utility for the BayouFinds / Wonder Piece Studio artist-to-puzzle workflow. It creates project records, tracks artist permission, imports artwork, exports manufacturing-sized images, stores catalog metadata, and creates print-ready production documents.
 

@@ -174,7 +174,7 @@ WORKFLOW_DOCX_ART = BRANDING_DIR / "workflow_export_docx_v2.png"
 def display_version(version):
     version = str(version).strip()
     if not version:
-        return "v0.1.3.2-SeanValidation"
+        return "v0.2.0-beta"
     return version if version.lower().startswith("v") else f"v{version}"
 
 

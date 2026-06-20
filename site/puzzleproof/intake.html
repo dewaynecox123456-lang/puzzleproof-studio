@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="PuzzleProof Studio helps puzzle makers, artists, Etsy sellers, and creative businesses manage artwork, approvals, releases, and production workflows.">
-  <meta property="og:title" content="PuzzleProof Studio">
-  <meta property="og:description" content="Software for puzzle makers, artists, Etsy sellers, and small creative businesses.">
+  <meta name="description" content="Submit artwork and order details for custom puzzle production review through PuzzleProof Studio and Wonder Piece Studio.">
+  <meta property="og:title" content="Make My Puzzle | PuzzleProof Studio">
+  <meta property="og:description" content="Request a custom puzzle, upload artwork, and send production notes to Sean and the BayouFinds / Wonder Piece Studio workflow.">
   <meta property="og:type" content="website">
-  <!-- Replace with the final production domain when the Netlify site is live. -->
-  <meta property="og:url" content="https://REPLACE-WITH-PUZZLEPROOF-SITE/intake.html">
+  <meta property="og:url" content="https://puzzleproof-studio.netlify.app/intake.html">
   <meta property="og:image" content="/assets/icons/puzzleproof-og.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PuzzleProof Studio">
-  <meta name="twitter:description" content="Software for puzzle makers, artists, Etsy sellers, and small creative businesses.">
+  <meta name="twitter:title" content="Make My Puzzle | PuzzleProof Studio">
+  <meta name="twitter:description" content="Submit artwork and order details for a custom puzzle production review.">
   <meta name="twitter:image" content="/assets/icons/puzzleproof-og.png">
-  <title>PuzzleProof Studio | BayouFinds</title>
+  <title>Make My Puzzle | PuzzleProof Studio</title>
   <link rel="icon" type="image/svg+xml" href="assets/icons/puzzleproof-icon.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -29,53 +28,53 @@
     </a>
     <nav aria-label="Primary navigation">
       <a href="index.html">Home</a>
-      <a href="index.html#features">Features</a>
-      <a href="index.html#screenshots">Screenshots</a>
-      <a href="intake.html">Project Intake</a>
-      <a href="index.html#team">Meet the Team</a>
-      <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Early Access</a>
+      <a href="index.html#what-it-does">What It Does</a>
+      <a href="index.html#workflow">Workflow</a>
+      <a href="index.html#download">Download</a>
+      <a href="intake.html">Make My Puzzle</a>
+      <a href="index.html#contact">Contact</a>
     </nav>
-    <a class="nav-cta" href="https://bayoufinds.com/b/x98IV" rel="noopener">Get Early Access</a>
+    <a class="nav-cta" href="intake.html">Make My Puzzle</a>
   </header>
 
   <main>
     <section class="section intake-hero">
       <div>
-        <p class="badge">Editable Project Intake</p>
-        <p class="eyebrow">Puzzle production review</p>
-        <h1>Project Intake Form</h1>
-        <p class="subheadline">Submit artwork and project details online so PuzzleProof Studio can review the workflow without sending non-editable files back and forth.</p>
+        <p class="badge">Custom Puzzle Intake</p>
+        <p class="eyebrow">Wonder Piece Studio request form</p>
+        <h1>Make My Puzzle</h1>
+        <p class="subheadline">Send Sean your artwork, contact details, quantity, deadline, and production notes in one clean workflow.</p>
+        <p class="support-text">This intake page keeps customer puzzle requests tied into the PuzzleProof Studio production process without creating a second website to maintain.</p>
       </div>
       <div class="intake-note">
         <strong>Before you submit</strong>
-        <p>Use this form for project details, approval status, manufacturing requests, notes, and optional artwork/reference images. You should only submit artwork you own or have permission to submit.</p>
+        <p>Only submit artwork you own or have permission to use. If the image is low resolution, cropped, blurry, or pulled from someone else online, the order may need extra review before production.</p>
       </div>
     </section>
 
     <section class="section intake-section" aria-labelledby="intake-form-title">
       <div class="form-copy">
         <p class="eyebrow">Online intake</p>
-        <h2 id="intake-form-title">Submit project details</h2>
-        <p>Complete this editable project intake form with artist contact details, artwork information, approval status, manufacturing requests, and optional reference images. Netlify Forms will send the submission for review after deployment.</p>
-        <p class="payhip-callout">Need the app too? <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Get Early Access on Payhip</a>.</p>
+        <h2 id="intake-form-title">Custom puzzle request</h2>
+        <p>Complete this form so Wonder Piece Studio can review the artwork, confirm production details, and follow up with next steps. Netlify Forms will capture the request and attached artwork after deployment.</p>
+        <p class="payhip-callout">Need the production app? <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio/releases/latest" rel="noopener">Download the latest PuzzleProof Studio release</a>.</p>
       </div>
 
-      <form class="intake-form" name="puzzleproof-project-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" action="/">
-        <input type="hidden" name="form-name" value="puzzleproof-project-intake">
+      <form class="intake-form" name="custom-puzzle-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" action="/success.html">
+        <input type="hidden" name="form-name" value="custom-puzzle-intake">
         <p class="hidden">
           <label>Do not fill this out: <input name="bot-field"></label>
         </p>
 
         <fieldset>
-          <legend>Artist Details</legend>
+          <legend>Customer Details</legend>
           <label>
-            Artist Name
-            <input type="text" name="artist_name" autocomplete="name" required>
+            Name
+            <input type="text" name="customer_name" autocomplete="name" required>
           </label>
           <label>
-            Artist Email
-            <input type="email" name="artist_email" autocomplete="email" required>
+            Email
+            <input type="email" name="customer_email" autocomplete="email" required>
           </label>
           <label>
             Phone Number
@@ -88,72 +87,66 @@
         </fieldset>
 
         <fieldset>
-          <legend>Artwork Details</legend>
+          <legend>Artwork Upload</legend>
           <label>
-            Artwork Title
-            <input type="text" name="artwork_title" required>
+            Artwork / Image Title
+            <input type="text" name="artwork_title" placeholder="Example: Family Reunion Photo" required>
           </label>
           <label>
             Copyright Owner
-            <input type="text" name="copyright_owner" required>
-          </label>
-          <label>
-            Artwork Size
-            <input type="text" name="artwork_size" placeholder="Example: 11 x 14 inches">
+            <input type="text" name="copyright_owner" placeholder="Who owns the image?" required>
           </label>
           <label>
             Upload Artwork / Reference Image
-            <input type="file" name="artwork_reference_image" accept="image/*">
+            <input type="file" name="artwork_reference_image" accept="image/*" required>
+          </label>
+          <label>
+            Image Notes
+            <input type="text" name="image_notes" placeholder="Example: Use the full image, do not crop heads, brighten if needed">
           </label>
         </fieldset>
 
         <fieldset>
-          <legend>Puzzle Details</legend>
+          <legend>Puzzle Order Details</legend>
           <label>
             Puzzle Size
-            <input type="text" name="puzzle_size" placeholder="Example: 8.83 x 11.77 inches">
+            <input type="text" name="puzzle_size" placeholder="Example: 20 x 16 inches">
           </label>
           <label>
             Piece Count
-            <input type="text" name="piece_count" placeholder="Example: 500">
+            <input type="text" name="piece_count" placeholder="Example: 120 pieces">
           </label>
           <label>
-            Catalog Number
-            <input type="text" name="catalog_number" placeholder="Leave blank if not assigned">
+            Quantity
+            <input type="number" name="quantity" min="1" placeholder="Example: 1" required>
           </label>
           <label>
-            Approval Status
-            <select name="approval_status" required>
-              <option value="">Choose status</option>
-              <option>Draft</option>
-              <option>Artist Submission</option>
-              <option>Approved</option>
-              <option>Manufacturing Ready</option>
-            </select>
+            Needed By
+            <input type="date" name="deadline">
           </label>
-          <label>
-            Manufacturing Request
-            <select name="manufacturing_request" required>
-              <option value="">Choose one</option>
-              <option>Yes</option>
-              <option>No</option>
-            </select>
+          <label class="full-span">
+            Shipping Address
+            <textarea name="shipping_address" rows="4" placeholder="Street, city, state, ZIP"></textarea>
           </label>
         </fieldset>
 
         <fieldset>
-          <legend>Notes and Agreement</legend>
+          <legend>Production Notes and Agreement</legend>
           <label class="full-span">
             Project Notes
-            <textarea name="project_notes" rows="6" placeholder="Share production notes, deadlines, print concerns, or questions."></textarea>
+            <textarea name="project_notes" rows="6" placeholder="Share production notes, gift occasion, deadline concerns, box label requests, or questions."></textarea>
           </label>
           <label class="checkbox-label full-span">
             <input type="checkbox" name="artwork_permission_confirmation" required>
-            <span>I confirm that I own or have permission to submit this artwork for puzzle production review.</span>
+            <span>I confirm that I own or have permission to submit this artwork for custom puzzle production review.</span>
+          </label>
+          <label class="checkbox-label full-span">
+            <input type="checkbox" name="contact_permission_confirmation" required>
+            <span>I agree that Sean / Wonder Piece Studio may contact me about this puzzle request.</span>
           </label>
         </fieldset>
 
-        <button type="submit">Submit Project Intake Form</button>
+        <button type="submit">Submit Custom Puzzle Request</button>
       </form>
     </section>
   </main>
@@ -173,7 +166,7 @@
     <div class="footer-secondary">
       <div class="footer-links">
         <a href="https://bayoufinds.com" rel="noopener">BayouFinds</a>
-        <a href="https://bayoufinds.com/b/x98IV" rel="noopener">Early Access</a>
+        <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio/releases/latest" rel="noopener">Download</a>
         <a href="index.html">Home</a>
         <a href="https://github.com/dewaynecox123456-lang/puzzleproof-studio" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>

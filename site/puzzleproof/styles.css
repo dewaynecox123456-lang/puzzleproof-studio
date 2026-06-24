@@ -202,6 +202,18 @@ h3 {
   font-weight: 700;
 }
 
+.hero-copy h1 {
+  font-size: clamp(3rem, 6vw, 5.75rem);
+  line-height: 0.95;
+  max-width: 780px;
+}
+
+.hero-copy .subheadline {
+  max-width: 720px;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  line-height: 1.45;
+}
+
 .build-label {
   margin-bottom: 16px;
   color: var(--green);
@@ -510,7 +522,7 @@ form,
 .download-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
-  gap: 32px;
+  gap: 56px;
   align-items: center;
 }
 
@@ -518,6 +530,10 @@ form,
 .download-panel p {
   color: var(--muted);
   font-size: 1.05rem;
+}
+
+.workflow-band h2 {
+  font-size: clamp(1.5rem, 2.8vw, 2.5rem);
 }
 
 .metric-card {
@@ -539,6 +555,14 @@ form,
   color: var(--green);
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   line-height: 1.05;
+}
+
+.workflow-sequence {
+  display: block;
+  margin-bottom: 0;
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  line-height: 1.25;
+  text-align: center;
 }
 
 .validation-partner {
